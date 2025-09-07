@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,53 +27,133 @@ public class VMController {
         )
     );
 
-    //выдаёт списко машин
+    //выдаёт список машин
     @GetMapping("/getAllStations")
     public List<VMStation> getAllStations() {
-        return VMStations;
+            return VMStations;
     }
 
     //выдаёт машину по id
     @GetMapping("/getByIdStation/{id}")
     public ResponseEntity<VMStation> getByIdStation(@PathVariable("id") Long id) {
-        for (VMStation station : VMStations) {
+        try{
+            for (VMStation station : VMStations) {
             if (station.getId().equals(id)) {
                 return ResponseEntity.ok(station);
             }
         }
         return ResponseEntity.notFound().build();
+        }
+        catch(Exception ex){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        
     }
 
     //выдаёт параметры свободной машины
     @GetMapping("/getFreeStation")
     public ResponseEntity<VMStation> getFreeVM() {
-        for (VMStation station : VMStations) {
+        try{
+            for (VMStation station : VMStations) {
             if (station.getState().equals(VMState.free)) {
                 return ResponseEntity.ok(station);
             }
         }
         return ResponseEntity.notFound().build();
-    }
-    
-    //бронирование
-    @PostMapping("/reservationStation/{id}")
-    public ResponseEntity<String> reservationStation(@PathVariable("id") Long id) {
-        VMStation tempVM = null;
-        for (VMStation station : VMStations) {
-            if (station.getId().equals(id)) {
-                tempVM = station;
-                break;
-            }
         }
-
-        if(tempVM != null &&(tempVM.getState().equals(VMState.free) || tempVM.getState().equals(VMState.off))){
-            tempVM.setState(VMState.reservation);
-            return ResponseEntity.ok("Забронированно");
-        }
-        else{
-            return ResponseEntity.ok("VM не найдена");
+        catch(Exception ex){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
         
     }
     
+    //бронирование
+    @PostMapping("/reservStation/{id}")
+    public ResponseEntity<String> reservStation(@PathVariable("id") Long id) {
+        try{
+            VMStation tempVM = null;
+            for (VMStation station : VMStations) {
+                if (station.getId().equals(id)) {
+                    tempVM = station;
+                    break;
+                }
+            }
+
+            if(tempVM != null &&(tempVM.getState().equals(VMState.free) || tempVM.getState().equals(VMState.off))){
+                tempVM.setState(VMState.reservation);
+                return ResponseEntity.ok("Забронированно");
+            }
+            else{
+                return ResponseEntity.ok("VM не найдена");
+            }
+        }
+        catch(Exception ex)
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    //выдаёт и подлкючает машину
+    @GetMapping("/getFreeConnect")
+    public ResponseEntity<VMStation> getFreeConnect() {
+        try{
+            for (VMStation station : VMStations) {
+            if (station.getState().equals(VMState.free)) {
+                station.setState(VMState.work);
+                return ResponseEntity.ok(station);
+            }
+        }
+        return ResponseEntity.notFound().build();
+        }
+        catch(Exception ex){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    //отключить выбранную машину
+    @PostMapping("/disconnectVM/{id}")
+    public ResponseEntity<String> disconnectVM(@PathVariable("id") Long id) {
+        try{
+            for (VMStation station : VMStations) {
+            if (station.getId().equals(id)) {
+                if(station.getState() == VMState.work){
+                    return new ResponseEntity<>("Внимание VM в работе, отключите пользователя перед выключением машины", HttpStatus.OK);
+                }
+                else{
+                    station.setState(VMState.off);
+                    return new ResponseEntity<>("VM оключена", HttpStatus.OK);
+                }
+            }
+        }
+        }
+        catch (Exception ex){
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>("VM не найдена", HttpStatus.OK);
+    }
+    
+    //Освободить машину
+    @PostMapping("/disconnectUserVM/{id}")
+    public ResponseEntity<String> disconnectUserVM(@PathVariable("id") Long id) {
+        try{
+            for (VMStation station : VMStations) {
+            if (station.getId().equals(id)) {
+                if(station.getState() == VMState.work){
+                    station.setState(VMState.free);
+                    return new ResponseEntity<>("Машина освобождена", HttpStatus.OK);
+                }
+                else{
+                    return new ResponseEntity<>("VM уже свободна", HttpStatus.OK);
+                }
+            }
+        }
+        }
+        catch (Exception ex){
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>("VM не найдена", HttpStatus.OK);
+    }
+
 }
