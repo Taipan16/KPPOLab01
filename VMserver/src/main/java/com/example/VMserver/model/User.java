@@ -1,5 +1,4 @@
 package com.example.VMserver.model;
-import com.example.VMserver.entity.eVMState;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,11 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class VMStation {
+public class User {
     private Long id;
-    private String ip;
-    private int port;
-    private eVMState state;
+    private String eMail;
     private String login;
     private String hashPassword;
 }
