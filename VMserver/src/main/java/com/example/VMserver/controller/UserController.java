@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
-public class VMQueueController {
+public class UserController {
     private List<User> Users = new ArrayList<>(
         Arrays.asList(
             new User(1l, "test@mail.ru", "test@mail.ru", "judfshghsdfguhdsfiughidfsuhgiu")
@@ -71,7 +71,7 @@ public class VMQueueController {
         } 
     }
     
-    //Удаление ВМ
+    //Удаление пользователя
     @PostMapping("/deleteUserById/{id}")
     public ResponseEntity<String> postMethodName(@PathVariable("id") long id) {
         try{
