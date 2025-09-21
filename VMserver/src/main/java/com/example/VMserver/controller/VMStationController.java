@@ -1,30 +1,48 @@
 package com.example.vmserver.controller;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-//import lombok.RequiredArgsConstructor;
+import com.example.vmserver.model.VMStation;
+import com.example.vmserver.service.VMStationService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
-//@RequiredArgsConstructor
+@RequestMapping("/api/stations")
+@RequiredArgsConstructor
 public class VMStationController {
-    
-    @GetMapping("/vmstations1")
-    public String getUsers(@RequestParam String param) {
-        return new String();
+    private final VMStationService stationService;
+
+    //Создание новой станции
+    @PostMapping
+    public ResponseEntity<VMStation> createStation(@RequestBody VMStation station) {
+        return ResponseEntity.ok(stationService.createStation(station));
     }
-    
-    @PostMapping("/vmstations2")
-    public String createUsers(@RequestBody String entity) {
-        return entity;
+
+    //Удаление станции по ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
+        stationService.deleteStation(id);
+        return ResponseEntity.ok().build();
     }
-    
-    @DeleteMapping("/vmstations3")
-    public String deleteUsers(@RequestBody String entity) {
-        return entity;
+
+    //Обновление станции
+    @PutMapping("/{id}")
+    public ResponseEntity<VMStation> updateStation(
+            @PathVariable Long id, 
+            @RequestBody VMStation stationDetails) {
+        return ResponseEntity.ok(stationService.updateStation(id, stationDetails));
+    }
+
+    //Получение списка всех станции
+    @GetMapping
+    public ResponseEntity<List<VMStation>> getAllStations() {
+        return ResponseEntity.ok(stationService.getAllStations());
+    }
+
+    //Получение станции по ID
+    @GetMapping("/{id}")
+    public ResponseEntity<VMStation> getStationById(@PathVariable Long id) {
+        return ResponseEntity.ok(stationService.getStationById(id));
     }
 }

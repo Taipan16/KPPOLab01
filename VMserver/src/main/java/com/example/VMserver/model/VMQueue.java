@@ -13,5 +13,4 @@ public class VMQueue {
     private Long id;
     private User currentUser;
     private VMStation vmStation;
-    //private DateTimeException beginSession;
 }
