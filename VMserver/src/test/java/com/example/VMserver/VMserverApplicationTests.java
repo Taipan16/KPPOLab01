@@ -1,10 +1,10 @@
-package com.example.VMserver;
+package com.example.vmserver;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class VMserverApplicationTests {
+class VmserverApplicationTests {
 
 	@Test
 	void contextLoads() {

@@ -1,6 +1,6 @@
-package com.example.VMserver.model;
+package com.example.vmserver.model;
 
-import java.time.DateTimeException;
+//import java.time.DateTimeException;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 public class VMQueue {
     private Long id;
     private User currentUser;
-    private DateTimeException beginSession;
+    private VMStation vmStation;
+    //private DateTimeException beginSession;
 }

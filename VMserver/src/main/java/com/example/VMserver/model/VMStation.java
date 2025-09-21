@@ -1,5 +1,4 @@
-package com.example.VMserver.model;
-import com.example.VMserver.entity.eVMState;
+package com.example.vmserver.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +11,8 @@ public class VMStation {
     private Long id;
     private String ip;
     private int port;
-    private eVMState state;
+    //private eVMState state;
     private String login;
     private String hashPassword;
 }
+

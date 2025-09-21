@@ -1,13 +1,13 @@
-package com.example.VMserver;
+package com.example.vmserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class VMserverApplication {
+public class VmserverApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(VMserverApplication.class, args);
+		SpringApplication.run(VmserverApplication.class, args);
 	}
 
 }
