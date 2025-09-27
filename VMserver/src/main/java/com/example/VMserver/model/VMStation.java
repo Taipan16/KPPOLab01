@@ -1,5 +1,7 @@
 package com.example.vmserver.model;
 
+import java.util.List;
+
 import com.example.vmserver.enums.VMState;
 
 import jakarta.persistence.Column;
@@ -9,6 +11,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -45,5 +48,8 @@ public class VMStation {
     //Пароль учетной записи
     @Column(name = "hash_password", nullable = false)
     private String hashPassword;
+
+    @ManyToMany
+    private List<User> users;
 }
 
