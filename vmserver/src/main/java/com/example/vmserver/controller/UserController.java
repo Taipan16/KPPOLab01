@@ -3,9 +3,14 @@ package com.example.vmserver.controller;
 import com.example.vmserver.model.User;
 import com.example.vmserver.service.UserService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -44,5 +49,21 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    //Сброс пароля
+    @PostMapping("/{userId}/reset-password")
+    public ResponseEntity<Map<String, String>> resetPassword(@PathVariable Long userId) {
+        try {
+            userService.resetPassword(userId);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Password reset successfully");
+            return ResponseEntity.ok(response);
+        }
+        catch (Exception e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Error resetting password");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 }

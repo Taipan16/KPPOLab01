@@ -3,7 +3,6 @@ package com.example.vmserver.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
 //import java.time.DateTimeException;

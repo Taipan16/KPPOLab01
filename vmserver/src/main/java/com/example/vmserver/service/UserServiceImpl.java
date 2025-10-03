@@ -5,6 +5,7 @@ import com.example.vmserver.repository.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -31,15 +32,19 @@ public class UserServiceImpl implements UserService {
     //Обновление полей пользователя
     @Override
     public User updateUser(Long id, User userDetails) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден по идентификатору: " + id));
+    User user = userRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден по идентификатору: " + id));
 
-        user.setLogin(userDetails.getLogin());
-        user.setEmail(userDetails.getEmail());
+    user.setLogin(userDetails.getLogin());
+    user.setEmail(userDetails.getEmail());
+    
+    // Обновляем пароль ТОЛЬКО если пришло новое значение
+    if (userDetails.getHashpassword() != null) {
         user.setHashpassword(userDetails.getHashpassword());
-        
-        return userRepository.save(user);
     }
+    
+    return userRepository.save(user);
+}
 
     //Получение всех пользователей
     @Override
@@ -52,5 +57,15 @@ public class UserServiceImpl implements UserService {
     public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден по идентификатору: " + id));
+    }
+
+    @Override
+    public void resetPassword(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        
+        String standardPassword = "Q12werty";
+        user.setHashpassword(standardPassword);
+        userRepository.save(user);
     }
 }

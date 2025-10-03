@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление базой данных VM Station</title>
+    <style>
+        :root {
+            --primary: #6a0dad;
+            --primary-light: #8a2be2;
+            --secondary: #9370db;
+            --accent: #4169e1;
+            --light-blue: #87ceeb;
+            --white: #ffffff;
+            --light-gray: #f5f5f5;
+            --dark: #333333;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-gray);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: var(--white);
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--white);
+            padding: 15px 20px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 2px 4px var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .table-selector {
+            display: flex;
+            gap: 10px;
+        }
+
+        .table-btn {
+            padding: 8px 16px;
+            background-color: var(--secondary);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .table-btn.active {
+            background-color: var(--primary);
+        }
+
+        .table-btn:hover {
+            background-color: var(--primary-light);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            background-color: var(--accent);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .action-btn:hover {
+            background-color: var(--light-blue);
+        }
+
+        .table-container {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px var(--shadow);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--secondary);
+            color: var(--white);
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        th:hover {
+            background-color: var(--primary-light);
+        }
+
+        th.sort-asc::after {
+            content: " ▲";
+            font-size: 0.8em;
+        }
+
+        th.sort-desc::after {
+            content: " ▼";
+            font-size: 0.8em;
+        }
+
+        tr:hover {
+            background-color: rgba(138, 43, 226, 0.05);
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 5px;
+        }
+
+        .edit-btn, .delete-btn, .reset-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .edit-btn {
+            background-color: var(--light-blue);
+            color: var(--dark);
+        }
+
+        .delete-btn {
+            background-color: #ff6b6b;
+            color: var(--white);
+        }
+
+        .reset-btn {
+            background-color: #ffa500;
+            color: var(--white);
+        }
+
+        .edit-btn:hover {
+            background-color: #63b3ed;
+        }
+
+        .delete-btn:hover {
+            background-color: #ff5252;
+        }
+
+        .reset-btn:hover {
+            background-color: #ff8c00;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-content {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .save-btn, .cancel-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            min-width: 100px;
+        }
+
+        .save-btn {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .cancel-btn {
+            background-color: #ddd;
+            color: var(--dark);
+        }
+
+        .save-btn:hover {
+            background-color: var(--primary-light);
+        }
+
+        .cancel-btn:hover {
+            background-color: #ccc;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--primary);
+        }
+
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 30px;
+            border-radius: 8px;
+            color: white;
+            z-index: 1100;
+            transition: opacity 0.3s;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-weight: 500;
+            min-width: 300px;
+        }
+
+        .notification.success {
+            background-color: #4caf50;
+        }
+
+        .notification.error {
+            background-color: #f44336;
+        }
+
+        .password-reset-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .password-reset-section h3 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .table-selector, .action-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+            }
+            
+            .modal-content {
+                padding: 20px;
+            }
+            
+            .save-btn, .cancel-btn {
+                min-width: 80px;
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Управление базой данных VM Station</h1>
+            <p>Выберите таблицу для работы и управляйте записями</p>
+        </header>
+
+        <div class="controls">
+            <div class="table-selector">
+                <button class="table-btn active" data-table="users">Пользователи</button>
+                <button class="table-btn" data-table="stations">Станции</button>
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn" id="add-btn">Добавить запись</button>
+                <button class="action-btn" id="refresh-btn">Обновить</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="data-table">
+                <thead id="table-header">
+                    <!-- Заголовки таблицы будут заполнены JavaScript -->
+                </thead>
+                <tbody id="table-body">
+                    <!-- Данные таблицы будут заполнены JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Модальное окно для добавления/редактирования -->
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Добавить запись</h2>
+            <div class="form-content">
+                <form id="edit-form">
+                    <!-- Поля формы будут заполнены JavaScript -->
+                </form>
+                <div class="password-reset-section" id="password-reset-section" style="display: none;">
+                    <h3>Управление паролем</h3>
+                    <button type="button" class="reset-btn" id="reset-password-btn">Сбросить пароль</button>
+                    <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">Пароль будет заменен на стандартный: Q12werty</p>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" class="cancel-btn" id="cancel-btn">Отмена</button>
+                <button type="button" class="save-btn" id="save-btn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Конфигурация API
+        const API_BASE = 'http://localhost:8080/api';
+        const DEFAULT_PASSWORD = 'Q12werty';
+        
+        // Состояние приложения
+        let currentTable = 'users';
+        let currentData = [];
+        let sortColumn = null;
+        let sortDirection = 'asc';
+        let editingId = null;
+
+        // Элементы DOM
+        const tableHeader = document.getElementById('table-header');
+        const tableBody = document.getElementById('table-body');
+        const tableBtns = document.querySelectorAll('.table-btn');
+        const addBtn = document.getElementById('add-btn');
+        const refreshBtn = document.getElementById('refresh-btn');
+        const editModal = document.getElementById('edit-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const editForm = document.getElementById('edit-form');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const passwordResetSection = document.getElementById('password-reset-section');
+        const resetPasswordBtn = document.getElementById('reset-password-btn');
+
+        // Определение структуры таблиц
+        const tableSchemas = {
+            users: {
+                endpoint: 'users',
+                columns: [
+                    { key: 'id', label: 'ID', type: 'number', editable: false },
+                    { key: 'login', label: 'Логин', type: 'text', editable: true, required: true },
+                    { key: 'email', label: 'Email', type: 'email', editable: true, required: true }
+                ],
+                hidden: [
+                    // Пароль удален из формы редактирования
+                ]
+            },
+            stations: {
+                endpoint: 'stations',
+                columns: [
+                    { key: 'id', label: 'ID', type: 'number', editable: false },
+                    { key: 'ip', label: 'IP-адрес', type: 'text', editable: true, required: true },
+                    { key: 'port', label: 'Порт', type: 'number', editable: true, required: true },
+                    { key: 'state', label: 'Состояние', type: 'select', editable: true, required: true, 
+                      options: ['OFF', 'ON', 'WORK', 'REPAIR', 'FREE', 'DISCONNECT'] },
+                    { key: 'login', label: 'Логин', type: 'text', editable: true, required: true }
+                ],
+                hidden: [
+                    { key: 'hashPassword', label: 'Пароль', type: 'password', editable: true, required: true }
+                ]
+            }
+        };
+
+        // Функции для работы с API
+        async function apiRequest(url, method = 'GET', data = null) {
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            };
+            
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/${url}`, options);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                // Для DELETE запросов может не быть тела ответа
+                if (response.status === 204 || method === 'DELETE') {
+                    return null;
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('API request failed:', error);
+                showNotification(`Ошибка: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        // Загрузка данных из БД
+        async function loadData() {
+            showLoading();
+            
+            try {
+                const schema = tableSchemas[currentTable];
+                currentData = await apiRequest(schema.endpoint);
+                renderTable();
+            } catch (error) {
+                console.error('Failed to load data:', error);
+                tableBody.innerHTML = '<tr><td colspan="10" class="no-data">Ошибка загрузки данных</td></tr>';
+            }
+        }
+
+        // Сохранение данных в БД
+        async function saveData(item, isNew = false) {
+            const schema = tableSchemas[currentTable];
+            
+            try {
+                if (isNew) {
+                    return await apiRequest(schema.endpoint, 'POST', item);
+                } else {
+                    return await apiRequest(`${schema.endpoint}/${editingId}`, 'PUT', item);
+                }
+            } catch (error) {
+                console.error('Failed to save data:', error);
+                throw error;
+            }
+        }
+
+        // Удаление данных из БД
+        async function deleteData(id) {
+            const schema = tableSchemas[currentTable];
+            
+            try {
+                await apiRequest(`${schema.endpoint}/${id}`, 'DELETE');
+                return true;
+            } catch (error) {
+                console.error('Failed to delete data:', error);
+                throw error;
+            }
+        }
+
+        // Сброс пароля пользователя
+        async function resetPassword(userId) {
+        try {
+            await apiRequest(`users/${userId}/reset-password`, 'POST');
+            showNotification('Пароль успешно сброшен на стандартный: ' + DEFAULT_PASSWORD, 'success');
+            return true;
+        }
+        catch (error) {
+            console.error('Failed to reset password:', error);
+            showNotification('Ошибка при сбросе пароля', 'error');
+            throw error;
+        }
+}
+
+        // Утилиты
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        function showLoading() {
+            tableBody.innerHTML = '<tr><td colspan="10" class="loading">Загрузка данных...</td></tr>';
+        }
+
+        // Инициализация приложения
+        function init() {
+            loadData();
+            setupEventListeners();
+        }
+
+        // Настройка обработчиков событий
+        function setupEventListeners() {
+            // Переключение между таблицами
+            tableBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tableBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentTable = btn.dataset.table;
+                    currentData = [];
+                    sortColumn = null;
+                    sortDirection = 'asc';
+                    loadData();
+                });
+            });
+
+            // Кнопка добавления записи
+            addBtn.addEventListener('click', () => {
+                editingId = null;
+                openEditModal();
+            });
+
+            // Кнопка обновления данных
+            refreshBtn.addEventListener('click', () => {
+                loadData();
+            });
+
+            // Отмена редактирования
+            cancelBtn.addEventListener('click', () => {
+                closeEditModal();
+            });
+
+            // Сохранение формы
+            saveBtn.addEventListener('click', () => {
+                saveForm();
+            });
+
+            // Сброс пароля
+            resetPasswordBtn.addEventListener('click', () => {
+                if (editingId) {
+                    resetPassword(editingId);
+                }
+            });
+        }
+
+        // Отрисовка таблицы
+        function renderTable() {
+            renderTableHeader();
+            renderTableBody();
+        }
+
+        // Отрисовка заголовка таблицы
+        function renderTableHeader() {
+            tableHeader.innerHTML = '';
+            const schema = tableSchemas[currentTable];
+            
+            // Отображаем видимые колонки
+            schema.columns.forEach(column => {
+                const th = document.createElement('th');
+                th.textContent = column.label;
+                th.dataset.column = column.key;
+                
+                // Добавление индикатора сортировки
+                if (sortColumn === column.key) {
+                    th.classList.add(sortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+                }
+                
+                th.addEventListener('click', () => sortTable(column.key));
+                tableHeader.appendChild(th);
+            });
+            
+            // Добавляем столбец для действий
+            const actionsTh = document.createElement('th');
+            actionsTh.textContent = 'Действия';
+            tableHeader.appendChild(actionsTh);
+        }
+
+        // Отрисовка тела таблицы
+        function renderTableBody() {
+            tableBody.innerHTML = '';
+            
+            if (currentData.length === 0) {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = tableSchemas[currentTable].columns.length + 1;
+                td.className = 'no-data';
+                td.textContent = 'Нет данных для отображения';
+                tr.appendChild(td);
+                tableBody.appendChild(tr);
+                return;
+            }
+            
+            currentData.forEach(item => {
+                const tr = document.createElement('tr');
+                const schema = tableSchemas[currentTable];
+                
+                // Отображаем видимые колонки
+                schema.columns.forEach(column => {
+                    const td = document.createElement('td');
+                    td.textContent = item[column.key] || '';
+                    tr.appendChild(td);
+                });
+                
+                // Добавляем кнопки действий
+                const actionsTd = document.createElement('td');
+                actionsTd.className = 'actions-cell';
+                
+                const editBtn = document.createElement('button');
+                editBtn.className = 'edit-btn';
+                editBtn.textContent = 'Редактировать';
+                editBtn.addEventListener('click', () => {
+                    editingId = item.id;
+                    openEditModal(item);
+                });
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = 'Удалить';
+                deleteBtn.addEventListener('click', () => deleteItem(item.id));
+                
+                // Добавляем кнопку сброса пароля только для таблицы пользователей
+                if (currentTable === 'users') {
+                    const resetBtn = document.createElement('button');
+                    resetBtn.className = 'reset-btn';
+                    resetBtn.textContent = 'Сбросить пароль';
+                    resetBtn.addEventListener('click', () => {
+                        if (confirm('Вы уверены, что хотите сбросить пароль пользователя на стандартный?')) {
+                            resetPassword(item.id);
+                        }
+                    });
+                    actionsTd.appendChild(resetBtn);
+                }
+                
+                actionsTd.appendChild(editBtn);
+                actionsTd.appendChild(deleteBtn);
+                tr.appendChild(actionsTd);
+                
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // Сортировка таблицы
+        function sortTable(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+            
+            currentData.sort((a, b) => {
+                let aVal = a[column];
+                let bVal = b[column];
+                
+                // Для числовых значений
+                if (!isNaN(aVal) && !isNaN(bVal)) {
+                    aVal = Number(aVal);
+                    bVal = Number(bVal);
+                }
+                
+                if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+            
+            renderTable();
+        }
+
+        // Открытие модального окна для редактирования
+        function openEditModal(item = null) {
+            modalTitle.textContent = item ? 'Редактировать запись' : 'Добавить запись';
+            editForm.innerHTML = '';
+            
+            const schema = tableSchemas[currentTable];
+            
+            // Показываем или скрываем секцию сброса пароля
+            if (currentTable === 'users' && item) {
+                passwordResetSection.style.display = 'block';
+            } else {
+                passwordResetSection.style.display = 'none';
+            }
+            
+            // Создаем поля для видимых колонок
+            schema.columns.forEach(column => {
+                if (!column.editable) return; // Пропускаем нередактируемые поля
+                
+                const formGroup = document.createElement('div');
+                formGroup.className = 'form-group';
+                
+                const label = document.createElement('label');
+                label.textContent = column.label;
+                label.htmlFor = column.key;
+                if (column.required) {
+                    label.innerHTML += ' <span style="color:red">*</span>';
+                }
+                
+                let input;
+                if (column.type === 'select') {
+                    input = document.createElement('select');
+                    input.id = column.key;
+                    input.name = column.key;
+                    if (column.required) {
+                        input.required = true;
+                    }
+                    
+                    column.options.forEach(option => {
+                        const optionEl = document.createElement('option');
+                        optionEl.value = option;
+                        optionEl.textContent = option;
+                        if (item && item[column.key] === option) {
+                            optionEl.selected = true;
+                        }
+                        input.appendChild(optionEl);
+                    });
+                } else {
+                    input = document.createElement('input');
+                    input.type = column.type;
+                    input.id = column.key;
+                    input.name = column.key;
+                    if (column.required) {
+                        input.required = true;
+                    }
+                    if (item) {
+                        input.value = item[column.key] || '';
+                    }
+                }
+                
+                formGroup.appendChild(label);
+                formGroup.appendChild(input);
+                editForm.appendChild(formGroup);
+            });
+            
+            // Создаем поля для скрытых колонок (кроме пароля для пользователей)
+            schema.hidden.forEach(field => {
+                if (!field.editable || (currentTable === 'users' && field.key === 'hashpassword')) {
+                    return; // Пропускаем пароль для пользователей
+                }
+                
+                const formGroup = document.createElement('div');
+                formGroup.className = 'form-group';
+                
+                const label = document.createElement('label');
+                label.textContent = field.label;
+                label.htmlFor = field.key;
+                if (field.required) {
+                    label.innerHTML += ' <span style="color:red">*</span>';
+                }
+                
+                const input = document.createElement('input');
+                input.type = field.type;
+                input.id = field.key;
+                input.name = field.key;
+                if (field.required) {
+                    input.required = true;
+                }
+                if (item) {
+                    input.value = item[field.key] || '';
+                }
+                
+                formGroup.appendChild(label);
+                formGroup.appendChild(input);
+                editForm.appendChild(formGroup);
+            });
+            
+            editModal.style.display = 'flex';
+        }
+
+        // Закрытие модального окна
+        function closeEditModal() {
+            editModal.style.display = 'none';
+        }
+
+        // Сохранение формы
+        async function saveForm() {
+            const formData = new FormData(editForm);
+            const newItem = {};
+            
+            // Собираем данные из формы
+            const schema = tableSchemas[currentTable];
+            
+            // Видимые колонки
+            schema.columns.forEach(column => {
+                if (column.editable) {
+                    newItem[column.key] = formData.get(column.key);
+                }
+            });
+            
+            // Скрытые колонки (кроме пароля для пользователей)
+            schema.hidden.forEach(field => {
+                if (field.editable && !(currentTable === 'users' && field.key === 'hashpassword')) {
+                    newItem[field.key] = formData.get(field.key);
+                }
+            });
+            
+            // Преобразуем числовые поля
+            if (newItem.port) {
+                newItem.port = parseInt(newItem.port);
+            }
+            
+            // Проверяем обязательные поля
+            let isValid = true;
+            [...schema.columns, ...schema.hidden].forEach(field => {
+                if (field.required && !(currentTable === 'users' && field.key === 'hashpassword') && !newItem[field.key]) {
+                    isValid = false;
+                    const input = document.querySelector(`[name="${field.key}"]`);
+                    if (input) {
+                        input.style.borderColor = 'red';
+                    }
+                }
+            });
+            
+            if (!isValid) {
+                showNotification('Заполните все обязательные поля', 'error');
+                return;
+            }
+            
+            try {
+                if (editingId) {
+                    // Редактирование существующей записи
+                    await saveData(newItem, false);
+                    showNotification('Запись успешно обновлена');
+                } else {
+                    // Добавление новой записи
+                    await saveData(newItem, true);
+                    showNotification('Запись успешно добавлена');
+                }
+                
+                // Обновляем данные и интерфейс
+                await loadData();
+                closeEditModal();
+            } catch (error) {
+                showNotification('Ошибка при сохранении записи', 'error');
+            }
+        }
+
+        // Удаление элемента
+        async function deleteItem(id) {
+            if (confirm('Вы уверены, что хотите удалить эту запись?')) {
+                try {
+                    await deleteData(id);
+                    showNotification('Запись успешно удалена');
+                    await loadData();
+                } catch (error) {
+                    showNotification('Ошибка при удалении записи', 'error');
+                    console.error('Delete error:', error);
+                    // В случае ошибки все равно обновляем данные
+                    await loadData();
+                }
+            }
+        }
+
+        // Запуск приложения
+        init();
+    </script>
+</body>
+</html>

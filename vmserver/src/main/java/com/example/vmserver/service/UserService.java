@@ -18,4 +18,6 @@ public interface UserService {
 
     // Получить пользователя по ID
     User getUserById(Long id);
+
+    void resetPassword(Long userId);
 }
