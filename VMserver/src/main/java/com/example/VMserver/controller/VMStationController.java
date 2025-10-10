@@ -3,9 +3,13 @@ package com.example.vmserver.controller;
 import com.example.vmserver.model.VMStation;
 import com.example.vmserver.service.VMStationService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/stations")
@@ -44,5 +48,13 @@ public class VMStationController {
     @GetMapping("/{id}")
     public ResponseEntity<VMStation> getStationById(@PathVariable Long id) {
         return ResponseEntity.ok(stationService.getStationById(id));
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<Object> getByFilter(@RequestParam(required = false) String login,
+    @RequestParam(required = false) Integer min,
+    @RequestParam(required = false) Integer max,
+    @PageableDefault(page = 0, size = 10, sort = "login") Pageable pageable) {
+        return ResponseEntity.ok(stationService.getByFilter(login, min, max, pageable));
     }
 }

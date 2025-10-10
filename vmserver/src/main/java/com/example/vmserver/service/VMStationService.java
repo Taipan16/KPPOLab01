@@ -3,6 +3,9 @@ package com.example.vmserver.service;
 import com.example.vmserver.model.VMStation;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 public interface VMStationService {
     //Добавить станцию
     VMStation createStation(VMStation station);
@@ -18,6 +21,8 @@ public interface VMStationService {
     
     //Показать станцию по ID
     VMStation getStationById(Long id);
+
+    Page<VMStation> getByFilter(String login, Integer min, Integer max, Pageable pageable);
 
     //Показать станцию по IP
     //VMStation getStationByIp(String ip);
