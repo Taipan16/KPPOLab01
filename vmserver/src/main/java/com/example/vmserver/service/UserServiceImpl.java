@@ -6,21 +6,30 @@ import com.example.vmserver.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     //Сохранение пользователя в БД
+    @Transactional
+    @CacheEvict(value = "User", allEntries = true)
     @Override
     public User createUser(User user) {
         return userRepository.save(user);
     }
 
     //Удаление пользователя
+    @Transactional
+    @CacheEvict(value = "User", allEntries = true)
     @Override
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
@@ -30,6 +39,8 @@ public class UserServiceImpl implements UserService {
     }
 
     //Обновление полей пользователя
+    @Transactional
+    @CacheEvict(value = "User", allEntries = true)
     @Override
     public User updateUser(Long id, User userDetails) {
     User user = userRepository.findById(id)
@@ -44,15 +55,19 @@ public class UserServiceImpl implements UserService {
     }
     
     return userRepository.save(user);
-}
+    }
 
     //Получение всех пользователей
+    @Transactional
+    @Cacheable(value = "Users")
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll(); 
     }
 
     //Получение пользователя по ID
+    @Transactional
+    @Cacheable(value = "Users", key = "#id")
     @Override
     public User getUserById(Long id) {
         return userRepository.findById(id)

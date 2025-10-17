@@ -17,7 +17,8 @@ public class CacheConfig {
     @Bean
     CacheManager cacheManager(){
         SimpleCacheManager scm = new SimpleCacheManager();
-        scm.setCaches(Arrays.asList(new ConcurrentMapCache("VMStation"), new ConcurrentMapCache("VMStations")));
+        scm.setCaches(Arrays.asList(new ConcurrentMapCache("VMStation"), new ConcurrentMapCache("VMStations"),
+        new ConcurrentMapCache("User"), new ConcurrentMapCache("Users")));
         return scm;
     }
 }

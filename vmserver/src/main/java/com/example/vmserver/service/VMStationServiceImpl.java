@@ -59,7 +59,7 @@ public class VMStationServiceImpl implements VMStationService {
 
     //Получение всех станций
     @Transactional
-    @Cacheable(value = "VMStations", key = "#id")
+    @Cacheable(value = "VMStations")
     @Override
     public List<VMStation> getAllStations() {
         return stationRepository.findAll();
