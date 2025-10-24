@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class VmserverApplication {
+public class VMserverApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(VmserverApplication.class, args);
+		SpringApplication.run(VMserverApplication.class, args);
 	}
 
 }

@@ -18,6 +18,11 @@ import com.example.vmserver.enums.TokenType;
 import com.example.vmserver.model.Token;
 import com.example.vmserver.repository.TokenRepository;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+
 
 
 @Service
