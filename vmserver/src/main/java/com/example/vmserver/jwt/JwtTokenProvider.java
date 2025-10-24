@@ -3,7 +3,6 @@ package com.example.vmserver.jwt;
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.temporal.Temporal;
 import java.time.temporal.TemporalUnit;
 import java.util.Base64;
 import java.util.Date;
@@ -56,7 +55,7 @@ public class JwtTokenProvider {
     }
 
     private Claims extractAllClaims(String value){
-        return Jwts.parser.Builder().setSigningKey(decodeSecretKey(key)).build().parseClaimsJwt(value).getBody();
+        return Jwts.parserBuilder().setSigningKey(decodeSecretKey(key)).build().parseClaimsJwt(value).getBody();
     }
 
     private Key decodeSecretKey(String key){
@@ -80,7 +79,7 @@ public class JwtTokenProvider {
             return false;
         }
         try{
-            Jwts.parserBuilder().setSingingKey(decodeSecretKey(key)).build().parseClaimsJwt(token);
+            Jwts.parserBuilder().setSigningKey(decodeSecretKey(key)).build().parseClaimsJwt(token);
             return !isDisabled(token);
         }
         catch(JwtException e){

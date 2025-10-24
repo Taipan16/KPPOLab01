@@ -16,7 +16,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -33,7 +32,7 @@ public class JwtAuthFilter extends OncePerRequestFilter{
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
     throws ServletException, IOException{
-        throw new UnsupportedOperationException("");
+        //throw new UnsupportedOperationException("");
         Cookie[] cookies = request.getCookies();
         String token = "";
         for(Cookie cookie: cookies){
@@ -43,7 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter{
             }
         }
 
-        if(token = "" || !jwtTokenProvider.isValid(token)){
+        if(token == "" || !jwtTokenProvider.isValid(token)){
             filterChain.doFilter(request, response);
             return;
         }

@@ -3,7 +3,8 @@ package com.example.vmserver.model;
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.security.core.token.TokenService;
+
+import com.example.vmserver.enums.TokenType;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,7 +20,7 @@ public class Token {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private TokenService type;
+    private TokenType type;
 
     private String value;
 
@@ -30,7 +31,7 @@ public class Token {
     @ManyToOne
     private VMUser vmUser;
 
-    public Token(TokenService type, String value, LocalDateTime expingDate, boolean disabled, VMUser vmUser) {
+    public Token(TokenType type, String value, LocalDateTime expingDate, boolean disabled, VMUser vmUser) {
         this.type = type;
         this.value = value;
         this.expingDate = expingDate;
