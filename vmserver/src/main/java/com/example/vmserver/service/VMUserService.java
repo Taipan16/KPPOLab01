@@ -23,11 +23,14 @@ public class VMUserService {
         return userRepository.findAll().stream().map(VMUserMapper::userToUserDTO).toList();
     }
 
-    public VMUserDTO getVMUser(Long id){
+    public VMUserDTO getVMUserDTO(Long id){
         VMUser user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("VMUser with id " + id + " not found"));
         return VMUserMapper.userToUserDTO(user);
     }
 
-
+    public VMUser getVMUser(Long id){
+        VMUser user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("VMUser with id " + id + " not found"));
+        return user;
+    }
     
 }

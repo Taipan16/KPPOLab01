@@ -2,13 +2,12 @@ package com.example.vmserver.model;
 
 import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.Id;
-
 import com.example.vmserver.enums.TokenType;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
@@ -24,17 +23,17 @@ public class Token {
 
     private String value;
 
-    private LocalDateTime expingDate;
+    private LocalDateTime expiringDate;
 
     private boolean disabled;
 
     @ManyToOne
     private VMUser vmUser;
 
-    public Token(TokenType type, String value, LocalDateTime expingDate, boolean disabled, VMUser vmUser) {
+    public Token(TokenType type, String value, LocalDateTime expiringDate, boolean disabled, VMUser vmUser) {
         this.type = type;
         this.value = value;
-        this.expingDate = expingDate;
+        this.expiringDate = expiringDate;
         this.disabled = disabled;
         this.vmUser = vmUser;
     }

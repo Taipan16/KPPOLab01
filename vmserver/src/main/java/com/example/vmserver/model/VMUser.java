@@ -14,6 +14,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,9 @@ public class VMUser implements UserDetails{
 
     @ManyToOne
     private Role role;
+
+    @OneToMany(mappedBy = "vmuser")
+    private Set<Token> tokens;
 
     @Override
     public Collection<?extends GrantedAuthority> getAuthorities(){
