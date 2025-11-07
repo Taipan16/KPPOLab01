@@ -29,8 +29,10 @@ public class VMUserService {
     }
 
     public VMUser getVMUser(Long id){
-        VMUser user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("VMUser with id " + id + " not found"));
-        return user;
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("VMUser with id " + id + " not found"));
     }
     
+    public VMUser getVMUser(String name){
+        return userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("VMUser with name " + name + " not found"));
+    }
 }

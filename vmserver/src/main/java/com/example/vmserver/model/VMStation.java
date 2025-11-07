@@ -14,12 +14,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "vm_stations")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class VMStation {
@@ -50,5 +52,5 @@ public class VMStation {
     private String hashPassword;
 
     @ManyToMany
-    private List<User> users;
+    private List<VMUser> users;
 }

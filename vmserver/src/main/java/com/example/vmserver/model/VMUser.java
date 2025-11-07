@@ -16,11 +16,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class VMUser implements UserDetails{
@@ -36,13 +38,13 @@ public class VMUser implements UserDetails{
     @ManyToOne
     private Role role;
 
-    @OneToMany(mappedBy = "vmuser")
+    @OneToMany(mappedBy = "vmUser")
     private Set<Token> tokens;
 
     @Override
     public Collection<?extends GrantedAuthority> getAuthorities(){
         Set<String> authorities = new HashSet<>();
-        role.getPermissions().forEach(P -> authorities.add(P.getAuthority()));
+        role.getPermissions().forEach(p -> authorities.add(p.getAuthority()));
         authorities.add(role.getAuthority());
         return authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
     }

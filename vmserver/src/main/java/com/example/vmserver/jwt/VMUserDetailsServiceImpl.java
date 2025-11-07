@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class VMUserDetailsServaiceImpl implements UserDetailsService{
+public class VMUserDetailsServiceImpl implements UserDetailsService{
     private final VMUserRepository userRepository;
 
     @Override

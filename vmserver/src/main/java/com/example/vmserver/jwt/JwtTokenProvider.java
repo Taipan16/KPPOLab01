@@ -55,7 +55,7 @@ public class JwtTokenProvider {
     }
 
     private Claims extractAllClaims(String value){
-        return Jwts.parserBuilder().setSigningKey(decodeSecretKey(key)).build().parseClaimsJwt(value).getBody();
+        return Jwts.parserBuilder().setSigningKey(decodeSecretKey(key)).build().parseClaimsJws(value).getBody();
     }
 
     private Key decodeSecretKey(String key){
@@ -79,7 +79,7 @@ public class JwtTokenProvider {
             return false;
         }
         try{
-            Jwts.parserBuilder().setSigningKey(decodeSecretKey(key)).build().parseClaimsJwt(token);
+            Jwts.parserBuilder().setSigningKey(decodeSecretKey(key)).build().parseClaimsJws(token);
             return !isDisabled(token);
         }
         catch(JwtException e){
@@ -87,7 +87,22 @@ public class JwtTokenProvider {
         }
     }
 
-    public Token generateAccessToken (Map <String, Object> extra, long duration, TemporalUnit durationType, UserDetails user){
+    public Token generatedAccessToken (Map <String, Object> extra, long duration, TemporalUnit durationType, UserDetails user){
+        String username = user.getUsername();
+
+        LocalDateTime now = LocalDateTime.now();
+
+        LocalDateTime expirationDate = now.plus(duration, durationType);
+
+        String value = Jwts.builder().setClaims(extra).setSubject(username)
+        .setIssuedAt(toDate(now))
+        .setExpiration(toDate(expirationDate))
+        .signWith(decodeSecretKey(key), SignatureAlgorithm.HS256).compact();
+
+        return new Token(TokenType.REFRESH, value, expirationDate, false, null);
+    }
+
+    public Token generatedRefreshToken (long duration, TemporalUnit durationType, UserDetails user){
         String username = user.getUsername();
 
         LocalDateTime now = LocalDateTime.now();

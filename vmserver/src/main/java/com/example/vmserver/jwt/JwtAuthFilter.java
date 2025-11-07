@@ -32,17 +32,20 @@ public class JwtAuthFilter extends OncePerRequestFilter{
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
     throws ServletException, IOException{
-        //throw new UnsupportedOperationException("");
         Cookie[] cookies = request.getCookies();
         String token = "";
-        for(Cookie cookie: cookies){
+        
+        if(cookies != null){
+            for(Cookie cookie: cookies){
             if(accessCookieName.equals(cookie.getName())){
                 token = cookie.getValue();
                 break;
             }
+            }
         }
+        
 
-        if(token == "" || !jwtTokenProvider.isValid(token)){
+        if("".equals(token) || !jwtTokenProvider.isValid(token)){
             filterChain.doFilter(request, response);
             return;
         }
