@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.vmserver.dto.LoginRequestDTO;
 import com.example.vmserver.dto.LoginResponseDTO;
+import com.example.vmserver.dto.ResetPasswordDTO;
 import com.example.vmserver.dto.VMUserLoggedDTO;
 import com.example.vmserver.service.AuthenticationService;
 
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -44,10 +46,17 @@ public class AuthenticationController {
         return authenticationService.logout(access, refresh);
     }
 
-    @PostMapping("info")
+    @GetMapping("/info")
     public ResponseEntity <VMUserLoggedDTO> info(){
         return ResponseEntity.ok(authenticationService.info());
     }
-    
+
+    @PostMapping("/reset")
+    public ResponseEntity<LoginResponseDTO> rersetPassword(
+        @CookieValue(name = "access_token", required = false) String access,
+        @CookieValue(name = "refresh_token", required = false) String refresh,
+        @RequestBody ResetPasswordDTO request){
+        return authenticationService.resetPassword(request, access, refresh);
+    }
     
 }
