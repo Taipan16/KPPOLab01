@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.vmserver.dto.LoginRequestDTO;
 import com.example.vmserver.dto.LoginResponseDTO;
+import com.example.vmserver.dto.RegisterRequestDTO;
 import com.example.vmserver.dto.ResetPasswordDTO;
 import com.example.vmserver.dto.VMUserLoggedDTO;
 import com.example.vmserver.service.AuthenticationService;
@@ -59,4 +60,9 @@ public class AuthenticationController {
         return authenticationService.resetPassword(request, access, refresh);
     }
     
+    @PostMapping("/register")
+    public ResponseEntity<LoginResponseDTO> register(@RequestBody RegisterRequestDTO request) {
+        return authenticationService.register(request);
+    }
+
 }

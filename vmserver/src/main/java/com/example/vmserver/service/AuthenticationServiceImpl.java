@@ -18,9 +18,11 @@
 
     import com.example.vmserver.dto.LoginRequestDTO;
     import com.example.vmserver.dto.LoginResponseDTO;
-    import com.example.vmserver.dto.ResetPasswordDTO;
+import com.example.vmserver.dto.RegisterRequestDTO;
+import com.example.vmserver.dto.ResetPasswordDTO;
     import com.example.vmserver.dto.VMUserLoggedDTO;
-    import com.example.vmserver.jwt.JwtTokenProvider;
+import com.example.vmserver.exception.ResourceNotFoundException;
+import com.example.vmserver.jwt.JwtTokenProvider;
     import com.example.vmserver.mapper.VMUserMapper;
     import com.example.vmserver.model.Token;
     import com.example.vmserver.model.VMUser;
@@ -157,4 +159,27 @@
             return logout(access, refresh);
         }
 
+
+        @Override
+        public ResponseEntity<LoginResponseDTO> register(RegisterRequestDTO request) {
+            // Проверка совпадения паролей
+            if (!request.password().equals(request.confirmPassword())) {
+                throw new RuntimeException("Пароли не совпадаю");
+            }
+            
+            // Проверка существования пользователя
+            try {
+                vmUserService.getVMUser(request.username());
+                throw new RuntimeException("Данный пользователь уже существует");
+            } catch (ResourceNotFoundException e) {
+                // Пользователь не существует - можно создавать
+            }
+            
+            // Создание нового пользователя
+            VMUser newUser = vmUserService.createUser(request.username(), request.password());
+            
+            // Аутентификация нового пользователя
+            LoginRequestDTO loginRequest = new LoginRequestDTO(request.username(), request.password());
+            return login(loginRequest, null, null);
+        }
     }

@@ -42,7 +42,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(auth -> { auth.requestMatchers(ALLOWED_URLS).permitAll();
-        auth.requestMatchers("/api/auth/login", "/api/auth/refresh").permitAll();
+        auth.requestMatchers("/api/auth/login", "/api/auth/refresh", "/api/auth/register").permitAll();
         auth.anyRequest().authenticated();});
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthEntryPoint));
