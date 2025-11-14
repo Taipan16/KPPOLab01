@@ -49,7 +49,7 @@ public class VMStationController {
     public ResponseEntity<VMStation> getStationById(@PathVariable Long id) {
         return ResponseEntity.ok(stationService.getStationById(id));
     }
-
+    
     @GetMapping("/filter")
     public ResponseEntity<Object> getByFilter(@RequestParam(required = false) String login,
     @RequestParam(required = false) Integer min,

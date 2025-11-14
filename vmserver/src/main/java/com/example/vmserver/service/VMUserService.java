@@ -89,5 +89,58 @@ public class VMUserService {
         return userRepository.save(user);
     }
 
+    public void deleteVMUser(Long id) {
+        VMUser user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("VMUser with id " + id + " not found"));
+        
+        // Проверяем, есть ли связанные токены и обрабатываем их при необходимости
+        if (user.getTokens() != null && !user.getTokens().isEmpty()) {
+            // Отключаем все токены пользователя перед удалением
+            user.getTokens().forEach(token -> token.setDisabled(true));
+        }
+        
+        userRepository.delete(user);
+    }
+
+    public VMUserDTO updateVMUserDTO(Long id, VMUserDTO userDTO) {
+        VMUser existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("VMUser with id " + id + " not found"));
+        
+        // Обновляем username, если он предоставлен и отличается от текущего
+        if (userDTO.username() != null && 
+            !userDTO.username().equals(existingUser.getUsername())) {
+            
+            if (userRepository.findByUsername(userDTO.username()).isPresent()) {
+                throw new RuntimeException("Username already exists");
+            }
+            existingUser.setUsername(userDTO.username());
+        }
+        
+        // Обновляем пароль, если он предоставлен и не пустой
+        if (userDTO.password() != null && !userDTO.password().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(userDTO.password()));
+        }
+        
+        // Обновляем роль, если она предоставлена
+        if (userDTO.role() != null) {
+            Role role = roleRepository.findByName(userDTO.role())
+                    .orElseThrow(() -> new ResourceNotFoundException("Role with name " + userDTO.role() + " not found"));
+            existingUser.setRole(role);
+        }
+        
+        VMUser updatedUser = userRepository.save(existingUser);
+        return VMUserMapper.userToUserDTO(updatedUser);
+    }
+
+    public List<VMUser> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public VMUserDTO getVMUserDTOByUsername(String username) {
+        VMUser user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("VMUser with username " + username + " not found"));
+        return VMUserMapper.userToUserDTO(user);
+    }   
 }
+
 

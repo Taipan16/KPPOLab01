@@ -159,7 +159,6 @@ import com.example.vmserver.jwt.JwtTokenProvider;
             return logout(access, refresh);
         }
 
-
         @Override
         public ResponseEntity<LoginResponseDTO> register(RegisterRequestDTO request) {
             // Проверка совпадения паролей
