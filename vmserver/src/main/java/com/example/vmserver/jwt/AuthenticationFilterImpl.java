@@ -20,4 +20,5 @@ public class AuthenticationFilterImpl extends UsernamePasswordAuthenticationFilt
         return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
             request.getParameter("username"), request.getParameter("password")));
     }
+
 }

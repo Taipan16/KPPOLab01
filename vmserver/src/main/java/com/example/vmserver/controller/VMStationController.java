@@ -6,8 +6,14 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import java.nio.charset.StandardCharsets;
+
 import java.util.List;
 
 
@@ -57,4 +63,20 @@ public class VMStationController {
     @PageableDefault(page = 0, size = 10, sort = "login") Pageable pageable) {
         return ResponseEntity.ok(stationService.getByFilter(login, min, max, pageable));
     }
+    
+    //Экспорт станций в CSV
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> exportStationsToCsv() {
+    String csvData = stationService.exportStationsToCsv();
+    byte[] bytes = csvData.getBytes(StandardCharsets.UTF_8);
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+    headers.setContentDisposition(ContentDisposition.attachment()
+            .filename("VMStationsList.csv")
+            .build());
+
+    return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+    }
+
 }

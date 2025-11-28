@@ -72,6 +72,7 @@
 
         @Override
         public ResponseEntity<LoginResponseDTO> login(LoginRequestDTO request, String access, String refresh) {
+            
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 request.username(), request.password()));
             VMUser user = vmUserService.getVMUser(request.username());

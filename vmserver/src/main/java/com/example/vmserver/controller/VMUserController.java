@@ -53,7 +53,7 @@ public class VMUserController {
         return ResponseEntity.ok(user);
     }
     
-    // Получение пользователя по имени пользователя
+    // Получение пользователя
     @GetMapping("/username/{username}")
     public ResponseEntity<VMUserDTO> getUserByUsername(@PathVariable String username) {
         VMUserDTO user = userService.getVMUserDTOByUsername(username);

@@ -24,6 +24,9 @@ public interface VMStationService {
 
     Page<VMStation> getByFilter(String login, Integer min, Integer max, Pageable pageable);
 
+    //выгрузка данных
+    String exportStationsToCsv();
+
     //Показать станцию по IP
     //VMStation getStationByIp(String ip);
 }

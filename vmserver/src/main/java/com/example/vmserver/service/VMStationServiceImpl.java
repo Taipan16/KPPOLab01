@@ -79,5 +79,26 @@ public class VMStationServiceImpl implements VMStationService {
         return stationRepository.findAll(VMStationSpecifications.filter(login, min, max), pageable);
     }
 
+    
+    @Override
+    public String exportStationsToCsv() {
+    List<VMStation> stations = stationRepository.findAll();
+    StringBuilder csvBuilder = new StringBuilder();
+    
+    // Заголовки CSV
+    csvBuilder.append("ID,IP,Port,State,Login,HashPassword\n");
+    
+    // Данные станций
+    for (VMStation station : stations) {
+        csvBuilder.append(station.getId()).append(",");
+        csvBuilder.append(station.getIp()).append(",");
+        csvBuilder.append(station.getPort()).append(",");
+        csvBuilder.append(station.getState()).append(",");
+        csvBuilder.append(station.getLogin()).append(",");
+        csvBuilder.append(station.getHashPassword()).append("\n");
+    }
+    
+    return csvBuilder.toString();
+    }
 
 }

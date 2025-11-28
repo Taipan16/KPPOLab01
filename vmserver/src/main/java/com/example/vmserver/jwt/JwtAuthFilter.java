@@ -29,9 +29,27 @@ public class JwtAuthFilter extends OncePerRequestFilter{
 
     private final UserDetailsService userDetailsService;
 
+    //Cписок endpoints, которые не требуют аутентификации
+    private boolean isPublicEndpoint(String requestURI) {
+        return requestURI.startsWith("/api/auth/login") ||
+               requestURI.startsWith("/api/auth/refresh") ||
+               requestURI.startsWith("/api/auth/register") ||
+               requestURI.startsWith("/swagger-ui/") ||
+               requestURI.startsWith("/v3/api-docs/");
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
     throws ServletException, IOException{
+
+        String requestURI = request.getRequestURI();
+        
+        // Если endpoint публичный - пропускаем без проверки JWT
+        if (isPublicEndpoint(requestURI)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         Cookie[] cookies = request.getCookies();
         String token = "";
         
@@ -43,7 +61,6 @@ public class JwtAuthFilter extends OncePerRequestFilter{
             }
             }
         }
-        
 
         if("".equals(token) || !jwtTokenProvider.isValid(token)){
             filterChain.doFilter(request, response);
