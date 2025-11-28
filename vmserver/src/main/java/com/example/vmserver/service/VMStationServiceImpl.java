@@ -67,7 +67,7 @@ public class VMStationServiceImpl implements VMStationService {
 
     //Получить станцию по ID
     @Transactional
-    @Cacheable(value = "VMStations", key = "#id")
+    @Cacheable(value = "VMStation", key = "#id")
     @Override
     public VMStation getStationById(Long id) {
         return stationRepository.findById(id)

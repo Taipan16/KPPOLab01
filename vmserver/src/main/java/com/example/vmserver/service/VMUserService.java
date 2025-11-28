@@ -3,8 +3,11 @@ package com.example.vmserver.service;
 import java.util.HashSet;
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.vmserver.dto.VMUserDTO;
 import com.example.vmserver.exception.ResourceNotFoundException;
@@ -27,23 +30,29 @@ public class VMUserService {
 
     private final RoleRepository roleRepository;
 
+    @Cacheable(value = "VMUser", key = "#id")
     public List<VMUserDTO> getVMUsers(){
         return userRepository.findAll().stream().map(VMUserMapper::userToUserDTO).toList();
     }
 
+    @Cacheable(value = "VMUser", key = "#id")
     public VMUserDTO getVMUserDTO(Long id){
         VMUser user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("VMUser with id " + id + " not found "));
         return VMUserMapper.userToUserDTO(user);
     }
 
+    @Cacheable(value = "VMUser", key = "#id")
     public VMUser getVMUser(Long id){
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("VMUser with id " + id + " not found"));
     }
     
+    @Cacheable(value = "VMUser", key = "#id")
     public VMUser getVMUser(String name){
         return userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("VMUser with name " + name + " not found"));
     }
-
+    
+    @CacheEvict(value = "VMStation", allEntries = true)
+    @Transactional
     public void resetPassword(Long userId, String oldPassword, String newPassword) {
         VMUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -57,6 +66,8 @@ public class VMUserService {
         }
     }
 
+    @CacheEvict(value = "VMStation", allEntries = true)
+    @Transactional
     public void resetPassword(String name, String oldPassword, String newPassword) {
         VMUser user = userRepository.findByUsername(name)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -70,6 +81,8 @@ public class VMUserService {
         }
     }
 
+    @CacheEvict(value = "VMStation", allEntries = true)
+    @Transactional
     public VMUser createUser(String username, String password) {
         // Проверка на существование пользователя
         if (userRepository.findByUsername(username).isPresent()) {
@@ -89,6 +102,8 @@ public class VMUserService {
         return userRepository.save(user);
     }
 
+    @CacheEvict(value = "VMStation", allEntries = true)
+    @Transactional
     public void deleteVMUser(Long id) {
         VMUser user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("VMUser with id " + id + " not found"));
@@ -102,6 +117,8 @@ public class VMUserService {
         userRepository.delete(user);
     }
 
+    @CacheEvict(value = "VMStation", allEntries = true)
+    @Transactional
     public VMUserDTO updateVMUserDTO(Long id, VMUserDTO userDTO) {
         VMUser existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("VMUser with id " + id + " not found"));
@@ -132,10 +149,12 @@ public class VMUserService {
         return VMUserMapper.userToUserDTO(updatedUser);
     }
 
+    @Cacheable(value = "VMUsers", key = "#id")
     public List<VMUser> getAllUsers() {
         return userRepository.findAll();
     }
 
+    @Cacheable(value = "VMUser", key = "#id")
     public VMUserDTO getVMUserDTOByUsername(String username) {
         VMUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("VMUser with username " + username + " not found"));

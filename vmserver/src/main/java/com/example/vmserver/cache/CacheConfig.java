@@ -18,7 +18,7 @@ public class CacheConfig {
     CacheManager cacheManager(){
         SimpleCacheManager scm = new SimpleCacheManager();
         scm.setCaches(Arrays.asList(new ConcurrentMapCache("VMStation"), new ConcurrentMapCache("VMStations"),
-        new ConcurrentMapCache("User"), new ConcurrentMapCache("Users")));
+        new ConcurrentMapCache("VMUser"), new ConcurrentMapCache("VMUsers")));
         return scm;
     }
 }

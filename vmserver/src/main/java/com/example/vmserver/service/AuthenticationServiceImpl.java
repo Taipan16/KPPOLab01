@@ -18,11 +18,11 @@
 
     import com.example.vmserver.dto.LoginRequestDTO;
     import com.example.vmserver.dto.LoginResponseDTO;
-import com.example.vmserver.dto.RegisterRequestDTO;
-import com.example.vmserver.dto.ResetPasswordDTO;
+    import com.example.vmserver.dto.RegisterRequestDTO;
+    import com.example.vmserver.dto.ResetPasswordDTO;
     import com.example.vmserver.dto.VMUserLoggedDTO;
-import com.example.vmserver.exception.ResourceNotFoundException;
-import com.example.vmserver.jwt.JwtTokenProvider;
+    import com.example.vmserver.exception.ResourceNotFoundException;
+    import com.example.vmserver.jwt.JwtTokenProvider;
     import com.example.vmserver.mapper.VMUserMapper;
     import com.example.vmserver.model.Token;
     import com.example.vmserver.model.VMUser;
@@ -48,7 +48,6 @@ import com.example.vmserver.jwt.JwtTokenProvider;
         private long refreshDurationDate;
         @Value("${jwt.refresh.duration.second}")
         private long refreshDurationSec;
-
 
         private void addAccessTokenCookie(HttpHeaders headers, Token token){
             headers.add(HttpHeaders.SET_COOKIE, cookieUtil.createAccessCookie(token.getValue(), accessDurationSec).toString());
@@ -170,12 +169,13 @@ import com.example.vmserver.jwt.JwtTokenProvider;
             try {
                 vmUserService.getVMUser(request.username());
                 throw new RuntimeException("Данный пользователь уже существует");
-            } catch (ResourceNotFoundException e) {
-                // Пользователь не существует - можно создавать
+            }
+            catch (ResourceNotFoundException e) {
+                
             }
             
             // Создание нового пользователя
-            VMUser newUser = vmUserService.createUser(request.username(), request.password());
+            vmUserService.createUser(request.username(), request.password());
             
             // Аутентификация нового пользователя
             LoginRequestDTO loginRequest = new LoginRequestDTO(request.username(), request.password());

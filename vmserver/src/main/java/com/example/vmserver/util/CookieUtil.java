@@ -1,5 +1,7 @@
 package com.example.vmserver.util;
 
+import java.io.Console;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.ResponseCookie;
@@ -14,7 +16,12 @@ public class CookieUtil {
     private String refreshTokenCookieName;
 
     public HttpCookie createAccessCookie(String value, long duration){
-        return ResponseCookie.from(accessTokenCookieName, value).maxAge(duration).httpOnly(true).secure(true).path("/").sameSite("None").build();
+        try {
+            return ResponseCookie.from(accessTokenCookieName, value).maxAge(duration).httpOnly(true).secure(true).path("/").sameSite("None").build();
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 
     public HttpCookie deleteAccessCookie(){
@@ -28,6 +35,4 @@ public class CookieUtil {
     public HttpCookie deleteRefreshCookie(){
         return ResponseCookie.from(refreshTokenCookieName, "").maxAge(0).httpOnly(true).secure(true).path("/").sameSite("None").build();
     }
-
-
 }
