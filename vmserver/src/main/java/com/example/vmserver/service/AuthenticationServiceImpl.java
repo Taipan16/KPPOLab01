@@ -163,7 +163,7 @@
         public ResponseEntity<LoginResponseDTO> register(RegisterRequestDTO request) {
             // Проверка совпадения паролей
             if (!request.password().equals(request.confirmPassword())) {
-                throw new RuntimeException("Пароли не совпадаю");
+                throw new RuntimeException("Пароли не совпадают");
             }
             
             // Проверка существования пользователя
@@ -172,10 +172,10 @@
                 throw new RuntimeException("Данный пользователь уже существует");
             }
             catch (ResourceNotFoundException e) {
-                
+                // Пользователь не существует - продолжаем
             }
             
-            // Создание нового пользователя
+            // Создание нового пользователя - теперь возвращает DTO
             vmUserService.createUser(request.username(), request.password());
             
             // Аутентификация нового пользователя

@@ -1,5 +1,6 @@
 package com.example.vmserver.controller;
 
+import com.example.vmserver.dto.CreateUserRequest;
 import com.example.vmserver.dto.PasswordResetRequest;
 import com.example.vmserver.dto.VMUserDTO;
 import com.example.vmserver.model.VMUser;
@@ -19,8 +20,8 @@ public class VMUserController {
 
     // Создание нового пользователя
     @PostMapping
-    public ResponseEntity<VMUser> createUser(@RequestBody VMUser user) {
-        VMUser createdUser = userService.createUser(user.getUsername(), user.getPassword());
+    public ResponseEntity<VMUserDTO> createUser(@RequestBody CreateUserRequest request) {
+        VMUserDTO createdUser = userService.createUser(request.username(), request.password());
         return ResponseEntity.ok(createdUser);
     }
 

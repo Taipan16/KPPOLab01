@@ -68,7 +68,7 @@ public class VMUserService {
 
     @CacheEvict(value = "VMUser", allEntries = true)
     @Transactional
-    public VMUser createUser(String username, String password) {
+    public VMUserDTO createUser(String username, String password) {
         // Проверка на существование пользователя
         if (userRepository.findByUsername(username).isPresent()) {
             throw new RuntimeException("User already exists");
@@ -84,7 +84,8 @@ public class VMUserService {
         user.setRole(userRole);
         user.setTokens(new HashSet<>());
         
-        return userRepository.save(user);
+        VMUser savedUser = userRepository.save(user);
+        return VMUserMapper.userToUserDTO(savedUser); // Возвращаем DTO вместо Entity
     }
 
     @CacheEvict(value = "VMUser", allEntries = true)
@@ -146,5 +147,3 @@ public class VMUserService {
         return VMUserMapper.userToUserDTO(user);
     }   
 }
-
-
