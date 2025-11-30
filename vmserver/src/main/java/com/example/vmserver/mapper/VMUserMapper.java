@@ -10,7 +10,7 @@ import com.example.vmserver.model.VMUser;
 
 public class VMUserMapper {
     public static VMUserDTO userToUserDTO(VMUser user){
-        return new VMUserDTO(user.getId(),
+        return new VMUserDTO(
         user.getUsername(),
         user.getPassword(),
         user.getRole().getAuthority(),

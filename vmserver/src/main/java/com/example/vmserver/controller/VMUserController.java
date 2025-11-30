@@ -1,5 +1,6 @@
 package com.example.vmserver.controller;
 
+import com.example.vmserver.dto.PasswordResetRequest;
 import com.example.vmserver.dto.VMUserDTO;
 import com.example.vmserver.model.VMUser;
 import com.example.vmserver.service.VMUserService;
@@ -60,23 +61,12 @@ public class VMUserController {
         return ResponseEntity.ok(user);
     }
 
-    // Сброс пароля пользователя
-    @PatchMapping("/{id}/password")
-    public ResponseEntity<Void> resetPassword(
-            @PathVariable Long id,
-            @RequestParam String oldPassword,
-            @RequestParam String newPassword) {
-        userService.resetPassword(id, oldPassword, newPassword);
-        return ResponseEntity.ok().build();
-    }
-
     // Сброс пароля пользователя по имени пользователя
     @PatchMapping("/username/{username}/password")
     public ResponseEntity<Void> resetPasswordByUsername(
             @PathVariable String username,
-            @RequestParam String oldPassword,
-            @RequestParam String newPassword) {
-        userService.resetPassword(username, oldPassword, newPassword);
+            @RequestBody PasswordResetRequest request) {
+        userService.resetPassword(username, request.oldPassword(), request.newPassword());
         return ResponseEntity.ok().build();
     }
 }

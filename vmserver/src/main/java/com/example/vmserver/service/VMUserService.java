@@ -30,7 +30,7 @@ public class VMUserService {
 
     private final RoleRepository roleRepository;
 
-    @Cacheable(value = "VMUser", key = "#id")
+    @Cacheable(value = "VMUser")
     public List<VMUserDTO> getVMUsers(){
         return userRepository.findAll().stream().map(VMUserMapper::userToUserDTO).toList();
     }
@@ -46,42 +46,27 @@ public class VMUserService {
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("VMUser with id " + id + " not found"));
     }
     
-    @Cacheable(value = "VMUser", key = "#id")
+    @Cacheable(value = "VMUser", key = "#name")
     public VMUser getVMUser(String name){
         return userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("VMUser with name " + name + " not found"));
     }
     
-    @CacheEvict(value = "VMStation", allEntries = true)
-    @Transactional
-    public void resetPassword(Long userId, String oldPassword, String newPassword) {
-        VMUser user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        if(passwordEncoder.matches(user.getPassword(), oldPassword)){
-            user.setPassword(passwordEncoder.encode(newPassword));
-            userRepository.save(user);
-        }
-        else{
-            throw new  RuntimeException("Password");
-        }
-    }
-
-    @CacheEvict(value = "VMStation", allEntries = true)
+    @CacheEvict(value = "VMUser", allEntries = true)
     @Transactional
     public void resetPassword(String name, String oldPassword, String newPassword) {
         VMUser user = userRepository.findByUsername(name)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
         
-        if(passwordEncoder.matches(user.getPassword(), oldPassword)){
+        if(passwordEncoder.matches(oldPassword, user.getPassword())){
             user.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(user);
         }
         else{
-            throw new  RuntimeException("Password");
+            throw new RuntimeException("Старый пароль неверен");
         }
     }
 
-    @CacheEvict(value = "VMStation", allEntries = true)
+    @CacheEvict(value = "VMUser", allEntries = true)
     @Transactional
     public VMUser createUser(String username, String password) {
         // Проверка на существование пользователя
@@ -102,7 +87,7 @@ public class VMUserService {
         return userRepository.save(user);
     }
 
-    @CacheEvict(value = "VMStation", allEntries = true)
+    @CacheEvict(value = "VMUser", allEntries = true)
     @Transactional
     public void deleteVMUser(Long id) {
         VMUser user = userRepository.findById(id)
@@ -117,7 +102,7 @@ public class VMUserService {
         userRepository.delete(user);
     }
 
-    @CacheEvict(value = "VMStation", allEntries = true)
+    @CacheEvict(value = "VMUser", allEntries = true)
     @Transactional
     public VMUserDTO updateVMUserDTO(Long id, VMUserDTO userDTO) {
         VMUser existingUser = userRepository.findById(id)
@@ -154,7 +139,7 @@ public class VMUserService {
         return userRepository.findAll();
     }
 
-    @Cacheable(value = "VMUser", key = "#id")
+    @Cacheable(value = "VMUser", key = "#username")
     public VMUserDTO getVMUserDTOByUsername(String username) {
         VMUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("VMUser with username " + username + " not found"));
