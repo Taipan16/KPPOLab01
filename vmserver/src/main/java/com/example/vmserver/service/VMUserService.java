@@ -140,7 +140,7 @@ public class VMUserService {
         return userRepository.findAll();
     }
 
-    @Cacheable(value = "VMUser", key = "#username")
+    @Cacheable(value = "VMUsers", key = "#username")
     public VMUserDTO getVMUserDTOByUsername(String username) {
         VMUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("VMUser with username " + username + " not found"));
