@@ -2,6 +2,11 @@ package com.example.vmserver.controller;
 
 import com.example.vmserver.model.VMStation;
 import com.example.vmserver.service.VMStationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Pageable;
@@ -20,63 +25,106 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/stations")
 @RequiredArgsConstructor
+@Tag(name = "Контроллер станций", description = "API для управления виртуальными машинами")
 public class VMStationController {
     private final VMStationService stationService;
 
-    //Создание новой станции
     @PostMapping
-    public ResponseEntity<VMStation> createStation(@RequestBody VMStation station) {
+    @Operation(summary = "Создание новой станции", 
+               description = "Создает новую виртуальную машину-станцию")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Станция успешно создана")
+    })
+    public ResponseEntity<VMStation> createStation(
+            @Parameter(description = "Данные для создания станции", required = true)
+            @RequestBody VMStation station) {
         return ResponseEntity.ok(stationService.createStation(station));
     }
 
-    //Удаление станции по ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
+    @Operation(summary = "Удаление станции по ID", 
+               description = "Удаляет виртуальную машину-станцию по указанному идентификатору")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Станция успешно удалена")
+    })
+    public ResponseEntity<Void> deleteStation(
+            @Parameter(description = "ID станции", required = true, example = "1")
+            @PathVariable Long id) {
         stationService.deleteStation(id);
         return ResponseEntity.ok().build();
     }
 
-    //Обновление станции
     @PutMapping("/{id}")
+    @Operation(summary = "Обновление данных станции", 
+               description = "Обновляет информацию о виртуальной машине-станции")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Данные станции успешно обновлены")
+    })
     public ResponseEntity<VMStation> updateStation(
+            @Parameter(description = "ID станции", required = true, example = "2")
             @PathVariable Long id, 
+            @Parameter(description = "Обновленные данные станции", required = true)
             @RequestBody VMStation stationDetails) {
         return ResponseEntity.ok(stationService.updateStation(id, stationDetails));
     }
 
-    //Получение списка всех станции
     @GetMapping
+    @Operation(summary = "Получение списка всех станций", 
+               description = "Возвращает список всех виртуальных машин-станций")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Список станций успешно получен")
+    })
     public ResponseEntity<List<VMStation>> getAllStations() {
         return ResponseEntity.ok(stationService.getAllStations());
     }
 
-    //Получение станции по ID
     @GetMapping("/{id}")
-    public ResponseEntity<VMStation> getStationById(@PathVariable Long id) {
+    @Operation(summary = "Получение станции по ID", 
+               description = "Возвращает данные виртуальной машины-станции по идентификатору")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Станция найдена")
+    })
+    public ResponseEntity<VMStation> getStationById(
+            @Parameter(description = "ID станции", required = true, example = "3")
+            @PathVariable Long id) {
         return ResponseEntity.ok(stationService.getStationById(id));
     }
     
     @GetMapping("/filter")
-    public ResponseEntity<Object> getByFilter(@RequestParam(required = false) String login,
-    @RequestParam(required = false) Integer min,
-    @RequestParam(required = false) Integer max,
-    @PageableDefault(page = 0, size = 10, sort = "login") Pageable pageable) {
+    @Operation(summary = "Фильтрация станций с пагинацией", 
+               description = "Возвращает отфильтрованный список станций с поддержкой пагинации. "
+                           + "Можно фильтровать по логину и диапазону значений")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Отфильтрованный список успешно получен")
+    })
+    public ResponseEntity<Object> getByFilter(
+            @Parameter(description = "Логин для фильтрации (частичное совпадение)", required = false, example = "user123")
+            @RequestParam(required = false) String login,
+            @Parameter(description = "Минимальное значение для фильтрации", required = false, example = "0")
+            @RequestParam(required = false) Integer min,
+            @Parameter(description = "Максимальное значение для фильтрации", required = false, example = "100")
+            @RequestParam(required = false) Integer max,
+            @Parameter(description = "Параметры пагинации и сортировки", required = false)
+            @PageableDefault(page = 0, size = 10, sort = "login") Pageable pageable) {
         return ResponseEntity.ok(stationService.getByFilter(login, min, max, pageable));
     }
     
-    //Экспорт станций в CSV
     @GetMapping("/export")
+    @Operation(summary = "Экспорт станций в CSV", 
+               description = "Экспортирует список всех станций в формате CSV файла для скачивания")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "CSV файл успешно сгенерирован")
+    })
     public ResponseEntity<byte[]> exportStationsToCsv() {
-    String csvData = stationService.exportStationsToCsv();
-    byte[] bytes = csvData.getBytes(StandardCharsets.UTF_8);
+        String csvData = stationService.exportStationsToCsv();
+        byte[] bytes = csvData.getBytes(StandardCharsets.UTF_8);
 
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-    headers.setContentDisposition(ContentDisposition.attachment()
-            .filename("VMStationsList.csv")
-            .build());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDisposition(ContentDisposition.attachment()
+                .filename("VMStationsList.csv")
+                .build());
 
-    return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+        return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
     }
-
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.vmserver.enums.VMState;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -24,33 +25,50 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Модель виртуальной машины (станции)")
 public class VMStation {
-    //ID станции
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Уникальный идентификатор виртуальной машины", 
+            example = "1",
+            accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
-    //IP адрес
     @Column(nullable = false, unique = true)
+    @Schema(description = "IP-адрес виртуальной машины", 
+            example = "192.168.1.100",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     private String ip;
 
-    //Порт подключения RDP
     @Column(nullable = false)
+    @Schema(description = "Порт для RDP подключения", 
+            example = "3389",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     private int port;
 
-    //Cостояние станции
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Schema(description = "Текущее состояние виртуальной машины", 
+            example = "OFF",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            allowableValues = {"OFF", "ON", "WORK", "REPAIR", "FREE", "DISCONNECT"})
     private VMState state;
 
-    //Логин учетной записи
     @Column(nullable = false)
+    @Schema(description = "Логин учетной записи для доступа к виртуальной машине", 
+            example = "admin",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     private String login;
 
-    //Пароль учетной записи
     @Column(name = "hash_password", nullable = false)
+    @Schema(description = "Пароль учетной записи", 
+            example = "Q12werty",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            accessMode = Schema.AccessMode.WRITE_ONLY)
     private String hashPassword;
 
     @ManyToMany
+    @Schema(description = "Список пользователей")
     private List<VMUser> users;
 }

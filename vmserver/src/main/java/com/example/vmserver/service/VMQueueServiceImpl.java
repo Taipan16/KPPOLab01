@@ -57,10 +57,10 @@ public class VMQueueServiceImpl implements VMQueueService {
         }
         
         // Создание новой записи в очереди
-        VMQueue queue = new VMQueue();
-        queue.setCurrentUser(user);
-        queue.setVmStation(station);
-        queue.setActive(true);
+        VMQueue queue = new VMQueue(user, station, true);
+        // queue.setCurrentUser(user);
+        // queue.setVmStation(station);
+        // queue.setActive(true);
         
         // Обновление статуса станции на WORK
         station.setState(VMState.WORK);

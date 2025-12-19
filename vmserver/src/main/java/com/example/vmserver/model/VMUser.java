@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,24 +26,39 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VMUser implements UserDetails{
+@Schema(description = "Модель пользователя системы")
+public class VMUser implements UserDetails {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Уникальный идентификатор пользователя", 
+            example = "228", 
+            accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
+    @Schema(description = "Имя пользователя для входа в систему", 
+            example = "user",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     private String username;
 
+    @Schema(description = "Пароль пользователя (хешированный)", 
+            example = "Q12werty",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            accessMode = Schema.AccessMode.WRITE_ONLY)
     private String password;
 
     @ManyToOne
+    @Schema(description = "Роль пользователя в системе")
     private Role role;
 
     @OneToMany(mappedBy = "vmUser")
+    @Schema(description = "Токены аутентификации пользователя",
+            accessMode = Schema.AccessMode.READ_ONLY)
     private Set<Token> tokens;
 
     @Override
-    public Collection<?extends GrantedAuthority> getAuthorities(){
+    @Schema(hidden = true) // Скрываем в Swagger UI, так как это метод Spring Security
+    public Collection<? extends GrantedAuthority> getAuthorities(){
         Set<String> authorities = new HashSet<>();
         role.getPermissions().forEach(p -> authorities.add(p.getAuthority()));
         authorities.add(role.getAuthority());

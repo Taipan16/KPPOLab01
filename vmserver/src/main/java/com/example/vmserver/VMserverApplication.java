@@ -9,5 +9,4 @@ public class VMserverApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(VMserverApplication.class, args);
 	}
-
 }
