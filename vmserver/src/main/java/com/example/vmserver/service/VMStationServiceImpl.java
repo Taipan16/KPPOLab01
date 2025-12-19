@@ -1,5 +1,6 @@
 package com.example.vmserver.service;
 
+import com.example.vmserver.enums.VMState;
 import com.example.vmserver.model.VMStation;
 import com.example.vmserver.repository.VMStationRepository;
 import com.example.vmserver.specifications.VMStationSpecifications;
@@ -13,7 +14,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -99,6 +104,70 @@ public class VMStationServiceImpl implements VMStationService {
     }
     
     return csvBuilder.toString();
+    }
+
+    @Transactional
+    @CacheEvict(value = {"VMStation", "VMStations"}, allEntries = true)
+    @Override
+    public String importStationsFromCsv(MultipartFile file) {
+        List<VMStation> importedStations = new ArrayList<>();
+        int importedCount = 0;
+        int skippedCount = 0;
+        
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            String line;
+            boolean isFirstLine = true;
+            
+            while ((line = br.readLine()) != null) {
+                // Пропускаем заголовок
+                if (isFirstLine) {
+                    isFirstLine = false;
+                    continue;
+                }
+                
+                String[] data = line.split(",");
+                if (data.length < 6) {
+                    skippedCount++;
+                    continue; // Пропускаем некорректные строки
+                }
+                
+                try {
+                    VMStation station = new VMStation();
+                    
+                    // ID игнорируем при импорте, т.к. он генерируется автоматически
+                    // data[0] - ID
+                    station.setIp(data[1].trim());
+                    station.setPort(Integer.parseInt(data[2].trim()));
+                    station.setState(VMState.valueOf(data[3].trim()));
+                    station.setLogin(data[4].trim());
+                    station.setHashPassword(data[5].trim());
+                    
+                    // Проверяем, существует ли станция с таким IP
+                    VMStation existingStation = stationRepository.findByIp(station.getIp());
+                    if (existingStation != null) {
+                        // Обновляем существующую станцию
+                        existingStation.setPort(station.getPort());
+                        existingStation.setState(station.getState());
+                        existingStation.setLogin(station.getLogin());
+                        existingStation.setHashPassword(station.getHashPassword());
+                        stationRepository.save(existingStation);
+                    } else {
+                        // Создаем новую станцию
+                        stationRepository.save(station);
+                    }
+                    
+                    importedCount++;
+                } catch (Exception e) {
+                    skippedCount++;
+                    // Логирование ошибки (можно добавить логгер)
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при импорте CSV файла: " + e.getMessage(), e);
+        }
+        
+        return String.format("Импорт завершен. Успешно импортировано: %d, Пропущено: %d", 
+                           importedCount, skippedCount);
     }
 
 }

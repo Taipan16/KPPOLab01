@@ -15,6 +15,7 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import java.nio.charset.StandardCharsets;
@@ -126,5 +127,34 @@ public class VMStationController {
                 .build());
 
         return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Импорт станций из CSV файла", 
+               description = "Загружает CSV файл с данными станций и добавляет/обновляет их в БД")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Файл успешно обработан"),
+        @ApiResponse(responseCode = "400", description = "Неверный формат файла"),
+        @ApiResponse(responseCode = "500", description = "Ошибка при обработке файла")
+    })
+    public ResponseEntity<String> importStationsFromCsv(
+            @Parameter(description = "CSV файл с данными станций", required = true)
+            @RequestParam("file") MultipartFile file) {
+        
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Файл пустой");
+        }
+        
+        if (!file.getOriginalFilename().toLowerCase().endsWith(".csv")) {
+            return ResponseEntity.badRequest().body("Неверный формат файла. Ожидается CSV");
+        }
+        
+        try {
+            String result = stationService.importStationsFromCsv(file);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Ошибка при импорте: " + e.getMessage());
+        }
     }
 }

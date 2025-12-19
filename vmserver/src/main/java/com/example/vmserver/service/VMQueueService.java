@@ -5,6 +5,8 @@ import com.example.vmserver.model.VMQueue;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public interface VMQueueService {
     
     // Связать станцию с пользователем

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface VMStationService {
     //Добавить станцию
@@ -29,4 +30,7 @@ public interface VMStationService {
 
     //Показать станцию по IP
     //VMStation getStationByIp(String ip);
+
+    //Импорт станций из CSV файла
+    String importStationsFromCsv(MultipartFile file);
 }

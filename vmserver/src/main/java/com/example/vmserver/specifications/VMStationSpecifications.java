@@ -6,6 +6,11 @@ import com.example.vmserver.model.VMStation;
 
 public class VMStationSpecifications {
 
+    public static Specification<VMStation> hasIp(String ip) {
+    return (root, query, criteriaBuilder) -> 
+        ip == null ? null : criteriaBuilder.equal(root.get("ip"), ip);
+    }
+
     /*
      * тут переделать под логин станции
      */
