@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class VMQueueController {
     private final VMQueueService queueService;
     
     @PostMapping("/assign")
+    @PreAuthorize("hasAuthority('QUEUE:ASSING')")
     @Operation(summary = "Привязать станцию к пользователю", 
                description = "Создает запись в очереди, связывая пользователя со станцией и меняя статус станции на WORK")
     public ResponseEntity<VMQueueDTO> assignStationToUser(@RequestBody AssignStationRequest request) {
@@ -29,6 +31,7 @@ public class VMQueueController {
     }
     
     @PostMapping("/release")
+    @PreAuthorize("hasAuthority('QUEUE:RELEASE')")
     @Operation(summary = "Освободить станцию", 
                description = "Освобождает станцию, меняя статус записи в очереди на неактивный и статус станции на FREE")
     public ResponseEntity<VMQueueDTO> releaseStation(@RequestBody ReleaseStationRequest request) {
@@ -37,6 +40,7 @@ public class VMQueueController {
     }
     
     @GetMapping("/inactive")
+    @PreAuthorize("hasAuthority('QUEUE:GETINACTIVE')")
     @Operation(summary = "Получить все неактивные записи", 
                description = "Возвращает список всех записей в очереди со статусом Active = false")
     public ResponseEntity<List<VMQueueDTO>> getAllInactiveRecords() {
@@ -45,6 +49,7 @@ public class VMQueueController {
     }
     
     @GetMapping("/user/{username}/active")
+    @PreAuthorize("hasAuthority('QUEUE:GETACTIVE')")
     @Operation(summary = "Получить активные станции пользователя", 
                description = "Возвращает список всех активных станций, связанных с пользователем по его логину")
     public ResponseEntity<List<VMQueueDTO>> getActiveStationsByUsername(@PathVariable String username) {
@@ -53,6 +58,7 @@ public class VMQueueController {
     }
     
     @GetMapping("/active")
+    @PreAuthorize("hasAuthority('QUEUE:GETACTIVEALL')")
     @Operation(summary = "Получить все активные записи", 
                description = "Возвращает список всех активных записей в очереди")
     public ResponseEntity<List<VMQueueDTO>> getAllActiveRecords() {
@@ -61,6 +67,7 @@ public class VMQueueController {
     }
     
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('QUEUE:GETID')")
     @Operation(summary = "Получить запись по ID", 
                description = "Возвращает запись из очереди по её идентификатору")
     public ResponseEntity<VMQueueDTO> getQueueRecordById(@PathVariable Long id) {
@@ -69,6 +76,7 @@ public class VMQueueController {
     }
     
     @GetMapping("/station/{stationId}/occupied")
+    @PreAuthorize("hasAuthority('QUEUE:OCCUPIED')")
     @Operation(summary = "Проверить занятость станции", 
                description = "Проверяет, занята ли станция каким-либо пользователем")
     public ResponseEntity<Boolean> isStationOccupied(@PathVariable Long stationId) {
@@ -77,6 +85,7 @@ public class VMQueueController {
     }
     
     @GetMapping("/user/{userId}/active-record")
+    @PreAuthorize("hasAuthority('QUEUE:ACTIVERECORD')")
     @Operation(summary = "Получить активную запись пользователя", 
                description = "Возвращает активную запись в очереди для указанного пользователя")
     public ResponseEntity<VMQueueDTO> getActiveRecordByUserId(@PathVariable Long userId) {

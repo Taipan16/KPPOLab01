@@ -12,6 +12,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +27,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class VMStationServiceImpl implements VMStationService {
     private final VMStationRepository stationRepository;
+    private final TelegramBotService telegramBotService;
 
     //Сохранение станции в БД
     @Transactional
@@ -44,7 +46,7 @@ public class VMStationServiceImpl implements VMStationService {
                 .orElseThrow(() -> new EntityNotFoundException("Станция не найден по идентификатору: " + id));
         stationRepository.delete(station);
     }
-
+    
     //Обновление полей станции
     @Transactional
     @CacheEvict(value = "VMStation", allEntries = true)
@@ -53,13 +55,32 @@ public class VMStationServiceImpl implements VMStationService {
         VMStation station = stationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Станция не найден по идентификатору: " + id));
         
+        // Сохраняем старый статус для уведомления
+        VMState oldState = station.getState();
+        VMState newState = stationDetails.getState();
+        
         station.setIp(stationDetails.getIp());
         station.setPort(stationDetails.getPort());
-        station.setState(stationDetails.getState());
+        station.setState(newState);
         station.setLogin(stationDetails.getLogin());
         station.setHashPassword(stationDetails.getHashPassword());
         
-        return stationRepository.save(station);
+        VMStation updatedStation = stationRepository.save(station);
+        
+        // Отправляем уведомление о изменении статуса
+        try {
+            String changedBy = SecurityContextHolder.getContext().getAuthentication().getName();
+            telegramBotService.sendVMStatusChangeNotification(
+                id,
+                oldState.toString(),
+                newState.toString(),
+                changedBy
+            );
+        } catch (Exception e) {
+            //log.error("Ошибка отправки уведомления в Telegram", e);
+        }
+        
+        return updatedStation;
     }
 
     //Получение всех станций

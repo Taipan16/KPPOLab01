@@ -14,6 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +22,6 @@ import org.springframework.http.MediaType;
 import java.nio.charset.StandardCharsets;
 
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/api/stations")
@@ -31,6 +31,7 @@ public class VMStationController {
     private final VMStationService stationService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('STATION:CREATE')")
     @Operation(summary = "Создание новой станции", 
                description = "Создает новую виртуальную машину-станцию")
     @ApiResponses(value = {
@@ -43,6 +44,7 @@ public class VMStationController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('STATION:DELETE')")
     @Operation(summary = "Удаление станции по ID", 
                description = "Удаляет виртуальную машину-станцию по указанному идентификатору")
     @ApiResponses(value = {
@@ -56,6 +58,7 @@ public class VMStationController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('STATION:UPDATE')")
     @Operation(summary = "Обновление данных станции", 
                description = "Обновляет информацию о виртуальной машине-станции")
     @ApiResponses(value = {
@@ -70,6 +73,7 @@ public class VMStationController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('STATION:GETALL')")
     @Operation(summary = "Получение списка всех станций", 
                description = "Возвращает список всех виртуальных машин-станций")
     @ApiResponses(value = {
@@ -80,6 +84,7 @@ public class VMStationController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('STATION:GETID')")
     @Operation(summary = "Получение станции по ID", 
                description = "Возвращает данные виртуальной машины-станции по идентификатору")
     @ApiResponses(value = {
@@ -92,6 +97,7 @@ public class VMStationController {
     }
     
     @GetMapping("/filter")
+    @PreAuthorize("hasAuthority('STATION:FILTER')")
     @Operation(summary = "Фильтрация станций с пагинацией", 
                description = "Возвращает отфильтрованный список станций с поддержкой пагинации. "
                            + "Можно фильтровать по логину и диапазону значений")
@@ -111,6 +117,7 @@ public class VMStationController {
     }
     
     @GetMapping("/export")
+    @PreAuthorize("hasAuthority('STATION:EXPORT')")
     @Operation(summary = "Экспорт станций в CSV", 
                description = "Экспортирует список всех станций в формате CSV файла для скачивания")
     @ApiResponses(value = {
@@ -130,6 +137,7 @@ public class VMStationController {
     }
 
     @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('STATION:IMPORT')")
     @Operation(summary = "Импорт станций из CSV файла", 
                description = "Загружает CSV файл с данными станций и добавляет/обновляет их в БД")
     @ApiResponses(value = {
@@ -141,7 +149,7 @@ public class VMStationController {
             @Parameter(description = "CSV файл с данными станций", required = true)
             @RequestParam("file") MultipartFile file) {
         
-        if (file.isEmpty()) {
+        if (file.isEmpty()) { 
             return ResponseEntity.badRequest().body("Файл пустой");
         }
         

@@ -28,7 +28,8 @@ public class VMQueueServiceImpl implements VMQueueService {
     private final VMQueueRepository queueRepository;
     private final VMUserRepository userRepository;
     private final VMStationRepository stationRepository;
-    
+    private final TelegramBotService telegramBotService;
+
     @Override
     @Transactional
     @CacheEvict(value = {"VMQueue", "VMStation"}, allEntries = true)
@@ -69,6 +70,18 @@ public class VMQueueServiceImpl implements VMQueueService {
         // Сохранение записи в очереди
         VMQueue savedQueue = queueRepository.save(queue);
         
+        try {
+        String changedBy = user.getUsername();
+        telegramBotService.sendVMStatusChangeNotification(
+            stationId,
+            VMState.FREE.toString(),
+            VMState.WORK.toString(),
+            changedBy
+        );
+        } catch (Exception e) {
+            //log.error("Ошибка отправки уведомления в Telegram", e);
+        }
+
         return VMQueueMapper.queueToQueueDTO(savedQueue);
     }
     
@@ -97,6 +110,18 @@ public class VMQueueServiceImpl implements VMQueueService {
         // Сохранение обновленной записи
         VMQueue updatedQueue = queueRepository.save(queue);
         
+        try {
+                String changedBy = queue.getCurrentUser().getUsername();
+                telegramBotService.sendVMStatusChangeNotification(
+                    station.getId(),
+                    VMState.WORK.toString(),
+                    VMState.FREE.toString(),
+                    changedBy
+                );
+            } catch (Exception e) {
+                //log.error("Ошибка отправки уведомления в Telegram", e);
+            }
+
         return VMQueueMapper.queueToQueueDTO(updatedQueue);
     }
     

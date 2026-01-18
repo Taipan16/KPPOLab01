@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class VMUserController {
     private final VMUserService userService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('USER:CREATE')")
     @Operation(summary = "Создание нового пользователя", 
                description = "Создает нового пользователя с заданными параметрами")
     @ApiResponses(value = {
@@ -37,6 +39,7 @@ public class VMUserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER:DELETE')")
     @Operation(summary = "Удаление пользователя по ID", 
                description = "Удаляет пользователя с указанным идентификатором")
     @ApiResponses(value = {
@@ -50,6 +53,7 @@ public class VMUserController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER:UPDATE')")
     @Operation(summary = "Обновление данных пользователя", 
                description = "Обновляет информацию о пользователе по указанному ID")
     @ApiResponses(value = {
@@ -65,6 +69,7 @@ public class VMUserController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('USER:GETALL')")
     @Operation(summary = "Получение списка всех пользователей", 
                description = "Возвращает список всех зарегистрированных пользователей")
     @ApiResponses(value = {
@@ -76,6 +81,7 @@ public class VMUserController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER:GETID')")
     @Operation(summary = "Получение пользователя по ID", 
                description = "Возвращает данные пользователя по указанному идентификатору")
     @ApiResponses(value = {
@@ -89,6 +95,7 @@ public class VMUserController {
     }
     
     @GetMapping("/username/{username}")
+    @PreAuthorize("hasAuthority('USER:GETNAME')")
     @Operation(summary = "Получение пользователя по имени", 
                description = "Возвращает данные пользователя по имени пользователя (username)")
     @ApiResponses(value = {
@@ -102,6 +109,7 @@ public class VMUserController {
     }
 
     @PatchMapping("/username/{username}/password")
+    @PreAuthorize("hasAuthority('USER:RESPASSWORD')")
     @Operation(summary = "Сброс пароля пользователя", 
                description = "Изменяет пароль пользователя по его имени. Требуется старый пароль для подтверждения.")
     @ApiResponses(value = {

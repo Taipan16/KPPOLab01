@@ -68,7 +68,7 @@ public class VMStation {
             accessMode = Schema.AccessMode.WRITE_ONLY)
     private String hashPassword;
 
-    @ManyToMany
-    @Schema(description = "Список пользователей")
-    private List<VMUser> users;
+    //@ManyToMany
+    //@Schema(description = "Список пользователей")
+    //private List<VMUser> users;
 }
