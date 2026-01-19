@@ -29,7 +29,8 @@ public class TelegramBotInitializer {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
             botsApi.registerBot(telegramBotService);
             log.info("Telegram бот успешно инициализирован: @{}", botConfig.getUsername());
-        } catch (TelegramApiException e) {
+        }
+        catch (TelegramApiException e) {
             log.error("Ошибка инициализации Telegram бота", e);
         }
     }

@@ -41,5 +41,5 @@ public interface UserTelegramChatRepository extends JpaRepository<UserTelegramCh
      * Удалить привязку по имени пользователя
      * @param username имя пользователя
      */
-    void deleteByUsername(String username);
+    int deleteByUsername(String username);
 }

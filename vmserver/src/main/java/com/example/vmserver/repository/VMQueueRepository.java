@@ -36,4 +36,20 @@ public interface VMQueueRepository extends JpaRepository<VMQueue, Long> {
     // Найти запись по станции и пользователю
     @Query("SELECT q FROM VMQueue q WHERE q.vmStation.id = :stationId AND q.currentUser.id = :userId AND q.active = true")
     Optional<VMQueue> findActiveByStationAndUser(@Param("stationId") Long stationId, @Param("userId") Long userId);
+    
+    // Подсчитать количество активных записей
+    long countByActiveTrue();
+    
+    // Подсчитать количество неактивных записей
+    long countByActiveFalse();
+    
+    // Дополнительный метод: найти все записи по ID пользователя
+    List<VMQueue> findByCurrentUserId(Long userId);
+    
+    // Дополнительный метод: найти все записи по ID станции
+    List<VMQueue> findByVmStationId(Long stationId);
+    
+    // Дополнительный метод: найти последнюю активную запись для станции
+    @Query("SELECT q FROM VMQueue q WHERE q.vmStation.id = :stationId AND q.active = true ORDER BY q.createdAt DESC")
+    List<VMQueue> findLastActiveByStationId(@Param("stationId") Long stationId);
 }

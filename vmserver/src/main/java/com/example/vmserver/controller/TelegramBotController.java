@@ -20,7 +20,7 @@ public class TelegramBotController {
     private final TelegramBotService telegramBotService;
     
     @GetMapping("/registrations")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('TGBOT:GETREGISTR')")
     @Operation(summary = "Получить все регистрации", 
                description = "Возвращает список всех пользователей, зарегистрированных в Telegram боте")
     public ResponseEntity<List<UserTelegramChat>> getAllRegistrations() {
@@ -29,9 +29,9 @@ public class TelegramBotController {
     }
     
     @GetMapping("/registrations/{username}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @Operation(summary = "Получить регистрацию пользователя", 
-               description = "Возвращает информацию о регистрации пользователя в Telegram боте")
+    @PreAuthorize("hasAuthority('TGBOT:GETREGISTR')")
+    @Operation(summary = "Получить данные о регистрации", 
+               description = "Возвращает информацию о регистрации в Telegram боте")
     public ResponseEntity<UserTelegramChat> getUserRegistration(@PathVariable String username) {
         UserTelegramChat registration = telegramBotService.getUserRegistration(username);
         if (registration == null) {
@@ -41,9 +41,9 @@ public class TelegramBotController {
     }
     
     @PostMapping("/notify/{username}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @Operation(summary = "Отправить тестовое уведомление", 
-               description = "Отправляет тестовое уведомление указанному пользователю через Telegram бот")
+    @PreAuthorize("hasAuthority('TGBOT:SENDMESSAGE')")
+    @Operation(summary = "Отправить уведомление или сообщение", 
+               description = "Отправляет сообщение указанному пользователю через Telegram бот")
     public ResponseEntity<Void> sendTestNotification(
             @PathVariable String username,
             @RequestParam String message) {
@@ -52,7 +52,7 @@ public class TelegramBotController {
     }
     
     @PostMapping("/notify/all")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('TGBOT:SENDMESSAGEADMIN')")
     @Operation(summary = "Отправить уведомление всем администраторам", 
                description = "Отправляет уведомление всем зарегистрированным администраторам через Telegram бот")
     public ResponseEntity<Void> sendNotificationToAllAdmins(@RequestParam String message) {
@@ -61,7 +61,7 @@ public class TelegramBotController {
     }
     
     @DeleteMapping("/registrations/{username}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('TGBOT:DELREGISTRATION')")
     @Operation(summary = "Удалить регистрацию пользователя", 
                description = "Удаляет регистрацию пользователя в Telegram боте")
     public ResponseEntity<Void> deleteRegistration(@PathVariable String username) {

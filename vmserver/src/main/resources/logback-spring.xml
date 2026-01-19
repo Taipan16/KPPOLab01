@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Консольный аппендер -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- Основной файловый аппендер -->
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>application.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- Отдельный файл для логов Telegram бота -->
+    <appender name="TELEGRAM_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>telegram-bot.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- Отдельный файл для логов станций -->
+    <appender name="STATION_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>station.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- Отдельный файл для логов пользователей -->
+    <appender name="USER_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>user.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- Root логгер -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </root>
+    
+    <!-- Логгер для AuthenticationServiceImpl -->
+    <logger name="com.example.vmserver.service.AuthenticationServiceImpl" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <!-- Логгер для ReportService -->
+    <logger name="com.example.vmserver.service.ReportService" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <!-- Логгер для TelegramBotServiceImpl -->
+    <logger name="com.example.vmserver.service.TelegramBotServiceImpl" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+        <appender-ref ref="TELEGRAM_FILE" />
+    </logger>
+    
+    <!-- Логгер для VMQueueServiceImpl -->
+    <logger name="com.example.vmserver.service.VMQueueServiceImpl" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <!-- Логгер для VMStationServiceImpl -->
+    <logger name="com.example.vmserver.service.VMStationServiceImpl" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+        <appender-ref ref="STATION_FILE" />
+    </logger>
+    
+    <!-- Логгер для VMUserService -->
+    <logger name="com.example.vmserver.service.VMUserService" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+        <appender-ref ref="USER_FILE" />
+    </logger>
+    
+    <!-- Логгер для Telegram API -->
+    <logger name="org.telegram" level="WARN" />
+    <logger name="org.telegram.telegrambots" level="DEBUG" />
+    
+    <!-- Логгер для Hibernate -->
+    <logger name="org.hibernate" level="WARN" />
+    <logger name="org.hibernate.SQL" level="DEBUG" />
+    
+    <!-- Логгер для Spring -->
+    <logger name="org.springframework" level="INFO" />
+    <logger name="org.springframework.security" level="DEBUG" />
+    
+    <!-- Логгер для Spring Cache -->
+    <logger name="org.springframework.cache" level="DEBUG" />
+    
+    <!-- Логгер для Spring Security -->
+    <logger name="org.springframework.security" level="INFO" />
+</configuration>
