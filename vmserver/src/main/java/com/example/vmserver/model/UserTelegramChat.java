@@ -25,13 +25,19 @@ public class UserTelegramChat {
     )
     private Long id;
     
-    @Column(nullable = false, unique = true)
+    @Column(name = "username", nullable = false, unique = true)
     @Schema(
         description = "Имя пользователя (логин) в системе",
         example = "admin",
         requiredMode = Schema.RequiredMode.REQUIRED
     )
     private String username;
+    
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "username", referencedColumnName = "username", 
+               insertable = false, updatable = false)
+    @Schema(description = "Пользователь, связанный с Telegram чатом")
+    private VMUser vmUser;
     
     @Column(name = "telegram_chat_id", nullable = false, unique = true)
     @Schema(

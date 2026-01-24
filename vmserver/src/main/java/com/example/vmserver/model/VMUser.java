@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,6 +37,7 @@ public class VMUser implements UserDetails {
             accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
+    @Column(unique = true) 
     @Schema(description = "Имя пользователя для входа в систему", 
             example = "user",
             requiredMode = Schema.RequiredMode.REQUIRED)
