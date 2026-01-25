@@ -9,6 +9,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CookieUtil {
+    @Value("${cookie.secure:false}")
+    private boolean secure;
+    
+    @Value("${cookie.same-site:Lax}")
+    private String sameSite;
+
     @Value("${jwt.access.cookie-name}")
     private String accessTokenCookieName;
 
@@ -17,7 +23,7 @@ public class CookieUtil {
 
     public HttpCookie createAccessCookie(String value, long duration){
         try {
-            return ResponseCookie.from(accessTokenCookieName, value).maxAge(duration).httpOnly(true).secure(true).path("/").sameSite("None").build();
+            return ResponseCookie.from(accessTokenCookieName, value).maxAge(duration).httpOnly(true).secure(secure).path("/").sameSite(sameSite).build();
         }
         catch (Exception e) {
             return null;
@@ -25,14 +31,14 @@ public class CookieUtil {
     }
 
     public HttpCookie deleteAccessCookie(){
-        return ResponseCookie.from(accessTokenCookieName, "").maxAge(0).httpOnly(true).secure(true).path("/").sameSite("None").build();
+        return ResponseCookie.from(accessTokenCookieName, "").maxAge(0).httpOnly(true).secure(secure).path("/").sameSite(sameSite).build();
     }
 
     public HttpCookie createRefreshCookie(String value, long duration){
-        return ResponseCookie.from(refreshTokenCookieName, value).maxAge(duration).httpOnly(true).secure(true).path("/").sameSite("None").build();
+        return ResponseCookie.from(refreshTokenCookieName, value).maxAge(duration).httpOnly(true).secure(secure).path("/").sameSite(sameSite).build();
     }
 
     public HttpCookie deleteRefreshCookie(){
-        return ResponseCookie.from(refreshTokenCookieName, "").maxAge(0).httpOnly(true).secure(true).path("/").sameSite("None").build();
+        return ResponseCookie.from(refreshTokenCookieName, "").maxAge(0).httpOnly(true).secure(secure).path("/").sameSite(sameSite).build();
     }
 }
