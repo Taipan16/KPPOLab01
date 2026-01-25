@@ -86,7 +86,7 @@
 
 1. **Клонировать репозиторий:**
 ```bash
-git clone <https://github.com/Taipan16/KPPOLab01>
+git clone https://github.com/Taipan16/KPPOLab01
 cd vmserver
 ```
 
@@ -116,3 +116,4 @@ sudo mvn clean install
   - Refresh токены действительны 7 дней
 
 ---
+
