@@ -1,4 +1,4 @@
-# 🖥️ VM Server REST API
+# 🖥️ VMServer REST API
 
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue?logo=postgresql)](https://www.postgresql.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2+-green?logo=spring)](https://spring.io/projects/spring-boot)
@@ -114,4 +114,5 @@ sudo mvn clean install
 - **JWT Конфигурация**:
   - Access токены действительны 5 минут
   - Refresh токены действительны 7 дней
+
 ---
